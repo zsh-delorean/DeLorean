@@ -1,0 +1,465 @@
+#!/usr/bin/env zsh
+
+if [ -z "${ZSH_VERSION}" ]; then
+  cat <<EOF >&2
+
+You may only source this script from within a Zsh session.
+
+Try running it instead: ./88 -c future
+
+EOF
+  return 1
+fi
+
+if ! [[ "${ZSH_EVAL_CONTEXT}" == 'toplevel' ]]; then
+  set -- "-q" "future"
+  alias exit='return'
+fi
+
+prog_name="${0:t}"
+prog_home="${0:A:h}"
+
+################################################################################
+# Help
+################################################################################
+
+#
+# Disallow sudo, in order to keep the space-time continuum intact.
+#
+
+(( EUID == 0 )) && {
+cat <<EOF >&2
+
+${prog_name}: An encounter with sudo could create a time paradox.
+
+The results of which could cause a chain reaction that would unravel the
+very fabric of the space-time continuum and destroy the entire universe!
+
+... Granted, that's the worst-case scenario. The destruction however
+might be limited merely to our own galaxy.
+
+EOF
+} && exit 1
+
+#
+# Are we in the modern era?
+#
+
+min_zsh_version='5.0'
+if ! autoload -Uz is-at-least || ! is-at-least "${min_zsh_version}"; then
+  cat <<EOF >&2
+
+${prog_name}: Prehistoric Zsh version detected!
+Plutonium not invented until Zsh version: ${min_zsh_version}
+Please install at least version ${min_zsh_version} of Zsh.
+
+EOF
+  exit 1
+fi
+
+#
+# Usage, or, What does this button do!?
+#
+
+function usage {
+  cat <<EOF >&2
+
+usage: ${prog_name} [-option ...] [--] command
+
+options:
+  -s         System-wide (/etc/zshenv instead of ~/.zshenv).
+  -q         Quietly suppress theme music and ascii art.
+  -c         Change the default login shell to Zsh.
+
+commands:
+  future     Send your Zsh into the future!
+  past       Travel back to how things were, before DeLorean.
+  circuit    Generates a minimal circuit with passed name.
+
+EOF
+  exit 1
+}
+
+################################################################################
+# Options
+################################################################################
+
+#
+# Defaults.
+#
+
+zshenv_ext='user'
+zshenv_loc="${HOME}/.zshenv"
+
+#
+# Get options.
+#
+
+while getopts ':sqc' opt; do
+  case "${opt}" in
+    (s)
+      zshenv_su='yes'
+      zshenv_ext='system'
+      zshenv_loc="/etc/zshenv"
+    ;;
+    (q)
+      quiet='yes'
+    ;;
+    (c)
+      change='yes'
+    ;;
+    (:)
+      print "${prog_name}: option requires an argument: ${OPTARG}" >&2
+      usage
+    ;;
+    ([?])
+      print "${prog_name}: unknown option: ${OPTARG}" >&2
+      usage
+    ;;
+  esac
+done
+shift $((OPTIND - 1))
+
+(( $# < 1 )) && usage
+
+################################################################################
+# Error strings.
+################################################################################
+
+#
+# Zshenv errors.
+#
+
+function STDERR_ZSHENV_{\
+HAS_BEEN_MODIFIED,\
+BACKUP_{PAST_CONFLICT,USER_ABORT},\
+SCHEMATIC_FAIL,\
+REMOVE_USER_ABORT,\
+REVERT_{BEGIN,FAIL,END}}
+{case "${0/STDERR_ZSHENV_/}" in
+  HAS_BEEN_MODIFIED) cat <<EOF >&2
+
+${zshenv_loc} has been modified since the last temporal displacement!
+
+Copy changes you intend to keep from:
+
+${zshenv_loc} -> ${prog_home}/ZDOTDIR/.zshenv
+
+Then remove ${zshenv_loc} and try again.
+
+EOF
+;;BACKUP_PAST_CONFLICT) cat <<EOF >&2
+
+Backup failed for ${zshenv_loc}. Move it away and try again.
+
+EOF
+;;BACKUP_USER_ABORT) cat <<EOF >&2
+
+
+${prog_name}: Aborting temporal displacement of ${zshenv_loc}
+
+EOF 
+;;SCHEMATIC_FAIL) cat <<EOF >&2
+
+Temporal displacement of ${zshenv_loc} has failed.
+
+EOF
+;;REMOVE_USER_ABORT) cat <<EOF >&2
+
+${prog_name}: Aborting removal of ${zshenv_loc}
+
+EOF
+;;REVERT_BEGIN) cat <<EOF >&2
+
+${prog_name}: Reverting ${zshenv_loc} to its original state.
+
+EOF
+;;REVERT_FAIL) cat <<EOF >&2
+
+Failed to rewind the hands of time for ${zshenv_loc}
+
+EOF
+;;REVERT_END) cat <<EOF >&2
+
+${prog_name}: Welcome to 1985.
+
+EOF
+esac}
+
+#
+# Change shell errors.
+#
+
+function STDERR_CHANGE_SHELL_{BEGIN,END,ABORT,WRONG,EMPTY,OTHER,BOGUS,MANUAL,UNCHANGED}
+{case "${0/STDERR_CHANGE_SHELL_/}" in
+  BEGIN) cat <<EOF >&2
+
+Time to change the default shell to Zsh!
+
+EOF
+;;END) cat <<EOF >&2
+
+Default login shell is now ${SHELL}
+
+EOF
+;;ABORT) cat <<EOF >&2
+
+Change of default login shell has been cancelled!
+To try again, run the following command at any time:
+    chsh -s "${CHSH_ZSH}"
+
+EOF
+;;WRONG) cat <<EOF >&2
+
+Wrong password. Press CTRL-C to cancel.
+
+EOF
+;;EMPTY) cat <<EOF >&2
+
+Empty password. Press CTRL-C to cancel.
+
+EOF
+;;OTHER) cat <<EOF >&2
+
+There was a problem changing the default login shell:
+
+${CHSH_ZSH_STDERR}
+
+EOF
+;;BOGUS) cat <<EOF >&2
+
+Cannot change default login shell automatically because there is a bad Zsh entry in /etc/shells.
+
+EOF
+;;MANUAL) cat <<EOF >&2
+
+Cannot change the default login shell because this system does not have chsh.
+Please manually change your default login shell to ${CHSH_ZSH}!
+
+EOF
+;;UNCHANGED) cat <<EOF >&2
+
+Default login shell is already ${SHELL}
+
+EOF
+esac}
+
+################################################################################
+# Setup.
+################################################################################
+
+#
+# Function for using schematics.
+#
+
+function schematic {
+  local in="${prog_home}/schematic/$1" out="$2" su="$3"
+  if ! [[ -f "${in}" ]]; then
+    cat <<EOF >&2
+
+Schematic file${in:+ "$1"} seems to have been lost in space and time!
+EOF
+    return 1
+  fi
+  if [[ -s "${out}" ]]; then
+    cat <<EOF >&2
+
+Schematic destination ${out} conflicts with an existing file!
+EOF
+    return 1
+  fi
+  local schema="${"$(<"${in}")"//__ZDOTDIR__/"${prog_home}/ZDOTDIR"}"
+  print "${schema}" | ${su:+sudo} tee "${out}" >/dev/null
+  ${su:+sudo} zsh -c "zmodload zsh/attr; zsetattr ${out} 'epoch' $(stat -f '%m' ${out})" &>/dev/null
+}
+
+#
+# When did we last touch zshenv?
+#
+
+zmodload zsh/attr
+zgetattr "${zshenv_loc}" 'epoch' zshenv_epoch &>/dev/null
+zshenv_stat="$(stat -f "%m" "${zshenv_loc}" 2>/dev/null)"
+
+################################################################################
+# Run
+################################################################################
+
+case "$@" in
+  
+  #
+  # Attempt temporal displacement of zshenv.
+  #
+
+  (future)
+    # if zshenv already exists
+    if (( zshenv_stat )); then
+      # and was created by us
+      if (( zshenv_epoch )); then
+        # but has been tampered with
+        if (( zshenv_epoch != zshenv_stat )); then
+          STDERR_ZSHENV_HAS_BEEN_MODIFIED
+          exit 1
+        fi
+      # or, it was not created by us
+      elif read -q "?Backup ${zshenv_loc} and proceed [y/N]? " && print; then
+        [[ ! -s "${zshenv_loc}.past" ]] && ${zshenv_su:+sudo} mv -v "${zshenv_loc}"{,.past} || {
+          STDERR_ZSHENV_BACKUP_PAST_CONFLICT
+          exit 1
+        }
+      # or, the user chose to abort
+      else
+        STDERR_ZSHENV_BACKUP_USER_ABORT
+        exit 1
+      fi
+    fi
+
+    # perform displacement
+    [[ -f "${zshenv_loc}" ]] && ${zshenv_su:+sudo} rm "${zshenv_loc}"
+    if ! schematic "zshenv.${zshenv_ext}" "${zshenv_loc}" $zshenv_su; then
+      STDERR_ZSHENV_SCHEMATIC_FAIL
+      exit 1
+    fi
+
+    # perform optional displacement of user files
+    rcs=('.zshenv' '.zprofile' '.zshrc' '.zlogin' '.zlogout')
+    for rc ("$rcs[@]") schematic "${rc}" "${prog_home}/ZDOTDIR/${rc}" 2>/dev/null
+  ;;
+
+  #
+  # Travel back to the past.
+  #
+
+  (past)
+    if (( zshenv_stat )); then
+      if (( zshenv_epoch )); then
+
+        if (( zshenv_epoch != zshenv_stat )); then
+          if ! read -q "?Remove ${zshenv_loc} even though it has unsaved changes [y/N]? " && print; then
+            STDERR_ZSHENV_REMOVE_USER_ABORT
+            exit 1
+          fi
+          print
+        fi
+
+        if [[ -s "${zshenv_loc}.past" ]]; then
+          STDERR_ZSHENV_REVERT_BEGIN
+          ${zshenv_su:+sudo} mv -f -v "${zshenv_loc}"{.past,}
+        else
+          ${zshenv_su:+sudo} rm "${zshenv_loc}"
+        fi
+
+        if (( $? != 0 )); then
+          STDERR_ZSHENV_REVERT_FAIL
+          exit 1
+        fi
+
+      fi
+    fi
+
+    STDERR_ZSHENV_REVERT_END
+    exit 0
+  ;;
+
+  #
+  # Generate a minimal circuit using the passed name.
+  #
+
+  (circuit*)
+    name="${@//circuit/}"
+    cat <<EOF >&2
+
+${prog_name}: Generating a new circuit: ${name}
+
+EOF
+  exit 0
+  ;;
+
+  #
+  # Command not yet invented. Maybe wait until 2025?
+  #
+
+  (*)
+    print "${prog_name}: unknown command: $@" >&2
+    usage
+  ;;
+esac
+
+#
+# Prompt user to use Zsh as default login shell?
+#
+
+if (( $+change )); then
+  if ! [[ "${SHELL}" =~ "zsh" ]]; then
+    if (( $+commands[chsh] )); then
+      STDERR_CHANGE_SHELL_BEGIN
+      CHSH_ZSH="$(grep /zsh$ /etc/shells | tail -1)"
+      if [ -n "$("$CHSH_ZSH" -c 'print "${ZSH_VERSION}"')" ]; then
+        trap 'true' INT
+        while true; do
+          CHSH_ZSH_STDERR="$(chsh -s "${CHSH_ZSH}" 2>&1)"
+          case $? in
+            0)
+              STDERR_CHANGE_SHELL_END
+              SHELL="${CHSH_ZSH}"
+              break
+            ;;
+            130)
+              # chsh returns 130 on CTRL-C
+              STDERR_CHANGE_SHELL_ABORT
+              break
+            ;;
+            *)
+              case "${CHSH_ZSH_STDERR}" in
+                *Credentials*)
+                  STDERR_CHANGE_SHELL_WRONG
+                ;;
+                *Empty*)
+                  STDERR_CHANGE_SHELL_EMPTY
+                ;;
+                *)
+                  STDERR_CHANGE_SHELL_OTHER
+                  break
+                ;;
+              esac
+            ;;
+          esac
+        done
+        trap - INT
+      else
+        STDERR_CHANGE_SHELL_BOGUS
+      fi
+    else
+      STDERR_CHANGE_SHELL_MANUAL
+    fi
+  else
+    STDERR_CHANGE_SHELL_UNCHANGED
+  fi
+fi
+
+#
+# Critical velocity has been reached (88 MPH)!
+#
+
+if (( ! $+quiet )); then
+  [[ "$(<"$prog_home/README.md")" =~ '```DeLorean(.*)```' ]] && print -f "%s\n" "${match[1]}"
+  if (( $+commands[afplay] )); then
+    afplay "$prog_home/.github/bttf.wav" &>/dev/null &
+  elif (( $+commands[aplay] )); then
+    aplay -t wav "$prog_home/.github/bttf.wav" &>/dev/null &
+  fi
+fi
+
+#
+# Compile all the main files for speed (run 88 again after editing these).
+#
+
+files=('.zlogin' '.zlogout' '.zprofile' '.zshenv' '.zshrc' 'engine.zsh' 'flux-capacitor.zsh')
+for file ("${files[@]}") zcompile -Uz "${prog_home}/ZDOTDIR/${file}"
+
+#
+# Start using the new DeLorean Zsh configuration!
+#
+
+unset ZDOTDIR ${(k)parameters[(I)DELOREAN_*]}
+exec zsh

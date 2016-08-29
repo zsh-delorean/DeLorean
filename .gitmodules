@@ -1,0 +1,42 @@
+[submodule "ZDOTDIR/circuits/environment"]
+	path = ZDOTDIR/circuits/environment
+	url = https://github.com/zsh-delorean/circuit-environment.git
+[submodule "ZDOTDIR/circuits/utility"]
+	path = ZDOTDIR/circuits/utility
+	url = https://github.com/zsh-delorean/circuit-utility.git
+[submodule "ZDOTDIR/circuits/completion"]
+	path = ZDOTDIR/circuits/completion
+	url = https://github.com/zsh-delorean/circuit-completion.git
+[submodule "ZDOTDIR/circuits/git"]
+	path = ZDOTDIR/circuits/git
+	url = https://github.com/zsh-delorean/circuit-git.git
+[submodule "ZDOTDIR/circuits/hub"]
+	path = ZDOTDIR/circuits/hub
+	url = https://github.com/zsh-delorean/circuit-hub.git
+[submodule "ZDOTDIR/circuits/editor"]
+	path = ZDOTDIR/circuits/editor
+	url = https://github.com/zsh-delorean/circuit-editor.git
+[submodule "ZDOTDIR/circuits/history"]
+	path = ZDOTDIR/circuits/history
+	url = https://github.com/zsh-delorean/circuit-history.git
+[submodule "ZDOTDIR/circuits/terminal"]
+	path = ZDOTDIR/circuits/terminal
+	url = https://github.com/zsh-delorean/circuit-terminal.git
+[submodule "ZDOTDIR/circuits/directory"]
+	path = ZDOTDIR/circuits/directory
+	url = https://github.com/zsh-delorean/circuit-directory.git
+[submodule "ZDOTDIR/circuits/syntax-highlighting"]
+	path = ZDOTDIR/circuits/syntax-highlighting
+	url = https://github.com/zsh-delorean/circuit-syntax-highlighting.git
+[submodule "ZDOTDIR/circuits/history-substring-search"]
+	path = ZDOTDIR/circuits/history-substring-search
+	url = https://github.com/zsh-delorean/circuit-history-substring-search.git
+[submodule "ZDOTDIR/circuits/mr.fusion"]
+	path = ZDOTDIR/circuits/mr.fusion
+	url = https://github.com/zsh-delorean/circuit-mr.fusion.git
+[submodule "ZDOTDIR/circuits/spectrum"]
+	path = ZDOTDIR/circuits/spectrum
+	url = https://github.com/zsh-delorean/circuit-spectrum.git
+[submodule "ZDOTDIR/circuits/prompt-pure"]
+	path = ZDOTDIR/circuits/prompt-pure
+	url = https://github.com/zsh-delorean/circuit-prompt-pure.git
