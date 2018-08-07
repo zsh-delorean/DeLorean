@@ -1,14 +1,14 @@
 ## Core
 
   1. [environment][] **(always first)**
-  1. [editor][] **(before any `keybind`)**
+  1. [editor][]
   1. [utility][]
   1. [history][]
   1. [terminal][]
   1. [directory][]
-  1. [completion][] **(after `utility`)**
+  1. [completion][]
   1. [syntax-highlighting][]
-  1. [history-substring-search][] **(after `syntax-highlighting`)**
+  1. [history-substring-search][]
   1. [git][]
   1. [hub][]
   1. [prompt-pure][] **(usually last)**
