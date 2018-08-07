@@ -8,16 +8,18 @@
 
 zstyle ':delorean:sequence' circuit \
   'environment' \
-  'utility' \
-  'completion' \
-  'git' \
-  'hub' \
   'editor' \
+  'utility' \
   'history' \
   'terminal' \
   'directory' \
+  'completion' \
   'syntax-highlighting' \
   'history-substring-search' \
+  'git' \
+  'hub' \
+  'nvm' \
+  'npm' \
   'prompt-pure'
 
 ################################################################################
