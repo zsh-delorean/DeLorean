@@ -1,6 +1,10 @@
-The `$fpath` blacklist allows the removal of unused functions from the ZSH `$fpath` by copying all referenced files (less those on the blacklist) into a special location, and then forcing the `$fpath` variable to that sole location.
+The `$fpath` blacklist allows the removal of unused functions from the ZSH
+`$fpath` by copying all referenced files (less those on the blacklist) into a
+special location, and then forcing the `$fpath` variable to that sole location.
 
-Because of how this works, `88` has to be re-run every time a new file is added to a standard `$fpath` location (usually after installing software that adds completion scripts).
+Because of how this works, `88` has to be re-run every time a new file is added
+to a standard `$fpath` location (usually after installing software that adds
+completion scripts).
 
 Reasons to blacklist unused completions and/or functions:
   
@@ -9,7 +13,8 @@ Reasons to blacklist unused completions and/or functions:
   - Resolve conflicts with other software.
   - Speed (less files for Zsh to parse through).
 
-Additionally, understanding what's available to blacklist unveils what Zsh has to offer, like Tetris!
+Additionally, understanding what's available to blacklist unveils what Zsh has
+to offer, like Tetris!
 
 ## Completions from ZSH version 5.2
 
@@ -25,7 +30,8 @@ These are the default completions that come with ZSH version 5.2
 | `_acroread`                  |     | Acroread is a well known PDF viewer.
 | `_adb`                       |     | Android Debug Bridge.
 | `_add-zsh-hook`              |  ✓  | The shell function add-zsh-hook provides a simple way of adding or removing functions from the array.
-| `_alias|_aliases`            |  ✓  | Often-used commands can be abbreviated with an alias.
+| `_alias`                     |  ✓  | Suggests `alias definition` completions for the `alias` command.
+| `_aliases`                   |  ✓  | Suggests `association key` completions for the `$aliases` array.
 | `_all_labels`                |  ✓  | Implements the loop over the tag aliases.
 | `_all_matches`               |  ✓  | This completer can be used to add a string consisting of all other matches.
 | `_alternative`               |  ✓  | This function is useful in simple cases where multiple tags are available.

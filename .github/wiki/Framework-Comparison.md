@@ -1,3 +1,7 @@
+The following table compares **DeLorean** with [Prezto][] and [Oh My Zsh][],
+the two overwhelmingly popular Zsh configuration frameworks that DeLorean is
+originally based on.
+
 | DeLorean | Prezto  | Oh My Zsh | Benefit |
 |:--------:|:-------:|:---------:|:------- |
 |_Circuits_|_Modules_|_Plugins_  | Component naming convention 
@@ -9,11 +13,16 @@
 | ✓        |         | ✓         | Install or Uninstall script
 | ✓        |         | ✓         | Makes use of template files
 | ✓        |         | ✓         | No symlinks, no realpathing
-| ✓        |         |           | No config location agnostic
+| ✓        |         |           | External components manager
+| ✓        |         |           | Load component in any order
+| ✓        |         |           | On-demand component loading
+| ✓        |         |           | Config is location agnostic
 | ✓        |         |           | Does not dirty up $HOME dir
 | ✓        |         |           | Remove unused Zsh functions
-| ✓        |         |           | On-demand component loading
-| ✓        |         |           | External components manager
 | ✓        |         |           | Aggressive variable caching
 | ✓        |         |           | Built for speed/ease of use
-| ✓        |         |           | Entertaining movie references
+| ✓        |         |           | Silly BTTF movie references
+
+
+[Prezto]: https://github.com/sorin-ionescu/prezto
+[Oh My Zsh]: https://github.com/robbyrussell/oh-my-zsh
