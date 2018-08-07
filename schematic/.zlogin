@@ -25,7 +25,7 @@
 
   # Print a random greeting.
   if (( $+commands[fortune] )); then
-    fortune -as
+    fortune -s
     print
   fi
 

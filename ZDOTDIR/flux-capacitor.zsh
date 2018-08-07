@@ -117,13 +117,13 @@ zstyle ':delorean:circuit:editor' key-bindings 'vi'
 # Auto convert .... to ../..
 #
 
-# zstyle ':delorean:circuit:editor' dot-expansion 'yes'
+zstyle ':delorean:circuit:editor' dot-expansion 'yes'
 
 #
 # Allow # comments on the interactive command line.
 #
 
-# zstyle ':delorean:circuit:editor' comments 'yes'
+zstyle ':delorean:circuit:editor' comments 'yes'
 
 ################################################################################
 # DeLorean git circuit.

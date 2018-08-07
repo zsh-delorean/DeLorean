@@ -25,13 +25,6 @@
 ################################################################################
 
 #
-# By default, Zsh considers many characters part of a word (e.g., _ and -).
-# Narrow that down to allow easier skipping through words via M-f and M-b.
-#
-
-export WORDCHARS='*?[]~&;!$%^<>'
-
-#
 # Browser.
 #
 
@@ -59,7 +52,7 @@ if [[ -z "${LANG}" ]]; then
 fi
 
 #
-# Set the default Less options.
+# Less options.
 # Mouse-wheel scrolling has been disabled by -X (disable screen clearing).
 # Remove -X and -F (exit if the content fits on one screen) to enable it.
 #
@@ -67,7 +60,7 @@ fi
 export LESS='-F -g -i -M -R -S -w -X -z-4'
 
 #
-# Set the Less input preprocessor.
+# Less input preprocessor.
 # Try both `lesspipe` and `lesspipe.sh` as either might exist on a system.
 #
 
@@ -84,18 +77,6 @@ fi
 #
 
 # export GOPATH="${HOME}/.go"
-
-#
-# Python.
-#
-
-# export PYENV_ROOT='/usr/local/var/pyenv'
-
-#
-# NVM.
-#
-
-# export NVM_DIR="${HOME}/.nvm"
 
 #
 # Homebrew Cask.
@@ -134,7 +115,7 @@ typeset -gU cdpath fpath mailpath path
 #
 
 path=(
-  '/opt/local/bin'
+  # "${GOPATH}/bin"
   '/usr/local/'{bin,sbin}
   $path
 )
