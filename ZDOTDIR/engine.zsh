@@ -11,7 +11,7 @@
 #
 
 min_zsh_version='5.0'
-if ! autoload -Uz is-at-least || ! is-at-least "$min_zsh_version"; then
+if ! autoload -Uz 'is-at-least' || ! is-at-least "${min_zsh_version}"; then
   cat <<EOF >&2
 
 DeLorean: Prehistoric Zsh version detected!
@@ -20,21 +20,21 @@ Plutonium not invented until Zsh version: ${min_zsh_version}
 EOF
   return 1
 fi
-unset min_zsh_version
+unset 'min_zsh_version'
 
 ################################################################################
 # Epoch.
 ################################################################################
 
 function epoch-{exists,uptodate,update} {
-  [[ -w "$1" ]] || return 3
+  [[ -w "$1" ]] || return 2
 
-  zmodload zsh/attr
+  zmodload 'zsh/attr'
 
   # Cache the value of DELOREAN_EPOCH.
-  if (( ! $+DELOREAN_EPOCH )); then
-    export DELOREAN_EPOCH
-    zgetattr "${DELOREAN_ZSHENV}" 'epoch' DELOREAN_EPOCH
+  if (( ! ${+DELOREAN_EPOCH} )); then
+    export 'DELOREAN_EPOCH'
+    zgetattr "${DELOREAN_ZSHENV}" 'epoch' 'DELOREAN_EPOCH'
   fi
 
   case "${0/epoch-/}" in
@@ -43,16 +43,16 @@ function epoch-{exists,uptodate,update} {
     # Checks if the file has the "epoch" attribute.
     #
 
-    exists)
-      zgetattr "$1" 'epoch' epoch_exists &>/dev/null && return 0 || return 1
+    'exists')
+      zgetattr "$1" 'epoch' 'epoch_exists' &>/dev/null && return 0 || return 1
     ;;
 
     #
     # Compares the "epoch" attribute of two files.
     #
 
-    uptodate)
-      zgetattr "$1" 'epoch' passed_epoch &>/dev/null || return 2
+    'uptodate')
+      zgetattr "$1" 'epoch' 'passed_epoch' &>/dev/null || return 1
       return $(( DELOREAN_EPOCH != passed_epoch ))
     ;;
 
@@ -60,7 +60,7 @@ function epoch-{exists,uptodate,update} {
     # Updates the "epoch" attribute of a file.
     #
 
-    update)
+    'update')
       zsetattr "$1" 'epoch' "${DELOREAN_EPOCH}"
     ;;
   esac
@@ -79,7 +79,8 @@ function epoch-{exists,uptodate,update} {
 #
 
 function fpath-flatten {
-  zstyle -a ':delorean:fpath' blacklist 'blacklist'
+  local 'blacklist'
+  zstyle -a ':delorean:fpath' 'blacklist' 'blacklist'
   blacklist="^(${(j:|:)blacklist})"
 
   if [[ -d "${DELOREAN_FPATH}" ]]; then
@@ -94,10 +95,10 @@ function fpath-flatten {
     return 1
   }
 
-  # Anon func to restrict glob and redirect "no match found" errors.
+  # Anon func to contain setopt and redirect "no match found" errors.
   function {
-    setopt LOCAL_OPTIONS EXTENDED_GLOB
-    for fp ("$fpath[@]") cp -n "${fp}/"$~blacklist "${DELOREAN_FPATH}"
+    setopt 'local_options' 'extended_glob'
+    for fp ("${fpath[@]}") cp -n "${fp}/"${~blacklist} "${DELOREAN_FPATH}"
   } &>/dev/null
 
   [[ -s "${DELOREAN_FPATH}/compinit" && -s "${DELOREAN_FPATH}/_complete" ]] || {
@@ -113,13 +114,14 @@ function fpath-flatten {
 #
 
 function fpath-digest {
-  typeset -a zarr ztail
+  local 'it'
+  local -a 'zarr' 'ztail'
 
-  setopt LOCAL_OPTIONS EXTENDED_GLOB
+  setopt 'local_options' 'extended_glob'
 
   for it in "${DELOREAN_FPATH}/"*; do
-    [[ ${${it:t}[1]} == '_' ]] && continue
-    ztail=(${zarr:t})
+    [[ "${${it:t}[1]}" == '_' ]] && continue
+    ztail=("${zarr[@]:t}")
     if [[ -z "${ztail[(r)${it:t}]}" ]]; then
       if zcompile -Uz "${TMPPREFIX}-try-zcompile" "${it}" &>/dev/null; then
         zarr+="${it}"
@@ -131,7 +133,7 @@ function fpath-digest {
     fi
   done
 
-  zcompile -Uz "${DELOREAN_DIGEST}" "$zarr[@]"
+  zcompile -Uz "${DELOREAN_DIGEST}" "${zarr[@]}"
 
   zcompile -t "${DELOREAN_DIGEST}" 'compinit' 'promptinit' || {
     print "DeLorean: Important functions missing from ${DELOREAN_DIGEST}" >&2
@@ -148,9 +150,9 @@ function fpath-digest {
 #
 
 function circuit-open {
-  typeset -ga DELOREAN_CIRCUITS
-  typeset -ga DELOREAN_FUNCTIONS
-  typeset -ga DELOREAN_COMPLETIONS
+  typeset -ga 'DELOREAN_CIRCUITS'
+  typeset -ga 'DELOREAN_FUNCTIONS'
+  typeset -ga 'DELOREAN_COMPLETIONS'
 
   DELOREAN_FPATH="${TMPPREFIX}-${ZSH_VERSION}-fpath"
   DELOREAN_DIGEST="${TMPPREFIX}-${ZSH_VERSION}-fpath.zwc"
@@ -158,12 +160,12 @@ function circuit-open {
 
   epoch-uptodate "${DELOREAN_FPATH}" && DELOREAN_UPTODATE='yes'
 
-  if (( $+DELOREAN_UPTODATE )) || fpath-flatten; then
+  if (( ${+DELOREAN_UPTODATE} )) || fpath-flatten; then
     DELOREAN_FLAT='yes'
     fpath=("${DELOREAN_FPATH}")
   fi
 
-  if (( $+DELOREAN_UPTODATE )); then
+  if (( ${+DELOREAN_UPTODATE} )); then
     fpath=("${DELOREAN_DIGEST}" $fpath)
   fi
 }
@@ -173,8 +175,10 @@ function circuit-open {
 #
 
 function digest {
+  local 'it'
+
   for it in "$@"; do
-    if [[ ${${it:t}[1]} == '_' ]]; then
+    if [[ "${${it:t}[1]}" == '_' ]]; then
       DELOREAN_COMPLETIONS=("${it}" $DELOREAN_COMPLETIONS)
     else
       DELOREAN_FUNCTIONS=("${it}" $DELOREAN_FUNCTIONS)
@@ -187,60 +191,76 @@ function digest {
 #
 
 function circuit {
-  local circuit
+  local 'circuit'
 
   for circuit in "$@"; do
-    if zstyle -t ":delorean:circuit:$circuit" initiated 'yes' 'no'; then
+    if zstyle -t ":delorean:circuit:${circuit}" 'initiated' 'yes' 'no'; then
       continue
-    elif [[ ! -d "${ZDOTDIR}/circuits/$circuit" ]]; then
-      print "DeLorean: no such circuit: $circuit" >&2
-      zstyle ":delorean:circuit:$circuit" initiated 'no'
+    elif [[ ! -d "${ZDOTDIR}/circuits/${circuit}" ]]; then
+      print "DeLorean: no such circuit: ${circuit}" >&2
+      zstyle ":delorean:circuit:${circuit}" initiated 'no'
       continue
     else
-      (( $+DELOREAN_UPTODATE )) || fpath=("${ZDOTDIR}/circuits/${circuit}" $fpath)
+      (( ${+DELOREAN_UPTODATE} )) || fpath=("${ZDOTDIR}/circuits/${circuit}" $fpath)
 
       # First call for each circuit in sequence.
       autoload -Uz +X "circuit-${circuit}" && "circuit-${circuit}"
 
-      if (( $? == 0 )); then
-        # Remember for second call (on close).
-        DELOREAN_CIRCUITS+=${circuit}
-        # Add the circuit itself to the digest.
-        digest "${ZDOTDIR}/circuits/${circuit}/circuit-${circuit}" 
-        # Don't try to initiate a second time.
-        zstyle ":delorean:circuit:$circuit" initiated 'yes'
-      else
-        print "DeLorean: Great Scott! The ${circuit} circuit failed to initiate." >&2
-        zstyle ":delorean:circuit:$circuit" initiated 'no'
-      fi
+      case "$?" in
+        ('0')
+          # Remember for second call (on close).
+          DELOREAN_CIRCUITS+="${circuit}"
+          # Add the circuit itself to the digest.
+          digest "${ZDOTDIR}/circuits/${circuit}/circuit-${circuit}" 
+          # Don't try to initiate a second time.
+          zstyle ":delorean:circuit:${circuit}" 'initiated' 'yes'
+        ;;
+        ('1')
+          print "DeLorean: Great Scott! The ${circuit} circuit failed to initiate." >&2
+        ;|
+        ('69')
+          # Service unavailable: Fail silently (usually a dumb terminal).
+        ;|
+        ('72')
+          # Critical file missing: Warn the user (maybe need to git pull submodules).
+          print "DeLorean: Great Scott! The ${circuit} circuit is missing critical files." >&2
+        ;|
+        ('78')
+          # Configuration error: Inform the user (perhaps the result of a dumb terminal).
+          print "DeLorean: Will not run the ${circuit} circuit due to configuration." >&2
+        ;|
+        (*)
+          zstyle ":delorean:circuit:${circuit}" 'initiated' 'no'
+        ;;
+      esac
     fi
   done
 }
 
 #
-# Allows sequencing of circuits after the fact. This has many side-effects, so a
-# circuit loaded this way would have to be specially designed for this use-case.
+# Allows sequencing of circuits after the fact. This has many side-effects, so
+# a circuit loaded this may need to be specially designed for this use-case.
 #
 # However, using interrupt for lazy-loading does seem to work with many of the
-# default circuits after some preliminary tests. This is useful if a circuit is
-# needed for a one-off task in a session.
+# default circuits after some preliminary tests, which might be useful if a
+# circuit is needed for a one-off task in a specific session.
 #
 # Obvious side-effects:
 #
-# ALL functions and completions from the circuit digest will be available on the
-# fpath. Does NOT respect load order, and it will be as if it were loaded last.
+# ALL functions and completions from the circuit digest will be available on
+# the fpath. Does NOT respect load order, and will be as if it loaded last.
 #
-# Initiation sequence will NOT be respected; will be as if it ran after all
-# modules had initialized and executed; because many may already have.
+# Initiation sequence will NOT be respected; will be as if it had ran after all
+# other modules initialized and executed; because many may already have.
 #
 # Will NOT be compiled in any way; compinit will be called with the -D flag.
 #
 
 function interrupt {
-  if [[ "$ZSH_EVAL_CONTEXT" != 'toplevel:shfunc' ]]; then
+  if [[ "${ZSH_EVAL_CONTEXT}" != 'toplevel:shfunc' ]]; then
     print 'DeLorean: The "interrupt" command should only be used from the command-line!' >&2
   fi
-  unset DELOREAN_UPTODATE DELOREAN_FLAT
+  unset 'DELOREAN_UPTODATE' 'DELOREAN_FLAT'
   DELOREAN_CIRCUITS=()
   DELOREAN_FUNCTIONS=()
   DELOREAN_COMPLETIONS=()
@@ -256,15 +276,15 @@ function interrupt {
 #
 
 function circuit-close {
-  autoload -Uz compinit
+  autoload -Uz 'compinit'
 
   # Compile everything.
-  if (( $+DELOREAN_UPTODATE )); then
+  if (( ${+DELOREAN_UPTODATE} )); then
     compinit -C -d "${DELOREAN_COMPDUMP}"
   else
-    local fallback
+    local 'fallback' 'circuit'
 
-    if (( $+DELOREAN_FLAT )); then
+    if (( ${+DELOREAN_FLAT} )); then
       if cp -f "${DELOREAN_FUNCTIONS[@]}" "${DELOREAN_COMPLETIONS[@]}" "${DELOREAN_FPATH}"; then
         if fpath-digest; then
           if compinit -i -d "${DELOREAN_COMPDUMP}"; then
@@ -287,14 +307,13 @@ function circuit-close {
 
     if [[ "${fallback}" == 'yes' ]]; then
       # Last-ditch effort to have a working configuration.
-      for func (${"${DELOREAN_FUNCTIONS[@]}":h}) fpath=("${func}" $fpath)
-      for comp (${"${DELOREAN_COMPLETIONS[@]}":h}) fpath=("${comp}" $fpath)
+      fpath=(${"${DELOREAN_FUNCTIONS[@]}":h} ${"${DELOREAN_COMPLETIONS[@]}":h} $fpath)
       compinit -i -D
     fi
   fi
   
   # Mark all digest functions added by circuits for autoload-ing.
-  for func (${"${DELOREAN_FUNCTIONS[@]}":t}) autoload -Uz "${func}"
+  autoload -Uz ${"${DELOREAN_FUNCTIONS[@]}":t}
 
   # Second call for each circuit in sequence.
   for circuit in "${DELOREAN_CIRCUITS[@]}"; do
@@ -318,33 +337,33 @@ fi
 # Disable color and theme in dumb terminals.
 #
 
-if [[ "$TERM" == 'dumb' ]]; then
-  zstyle ':delorean:*:*' color 'no'
-  zstyle ':delorean:circuit:prompt' theme 'off'
+if [[ "${TERM}" == 'dumb' ]]; then
+  zstyle ':delorean:*:*' 'color' 'no'
+  zstyle ':delorean:circuit:prompt' 'theme' 'off'
 fi
 
 #
 # Load Zsh modules.
 #
 
-zstyle -a ':delorean:load' zmodule 'zmodules'
-for zmodule ("$zmodules[@]") zmodload "zsh/${(z)zmodule}"
-unset zmodule{s,}
+zstyle -a ':delorean:load' 'zmodule' 'zmodules'
+for zmodule ("${zmodules[@]}") zmodload "zsh/${(z)zmodule}"
+unset 'zmodule'{,'s'}
 
 #
 # Autoload Zsh functions.
 #
 
-zstyle -a ':delorean:load' zfunction 'zfunctions'
-for zfunction ("$zfunctions[@]") autoload -Uz "$zfunction"
-unset zfunction{s,}
+zstyle -a ':delorean:load' 'zfunction' 'zfunctions'
+autoload -Uz "${zfunctions[@]}"
+unset 'zfunctions'
 
 #
 # Sequence DeLorean circuits.
 #
 
 circuit-open
-zstyle -a ':delorean:sequence' circuit 'circuits'
-circuit "$circuits[@]"
-unset circuits
+zstyle -a ':delorean:sequence' 'circuit' 'circuits'
+circuit "${circuits[@]}"
+unset 'circuits'
 circuit-close

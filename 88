@@ -1,87 +1,282 @@
 #!/usr/bin/env zsh
 
-if [ -z "${ZSH_VERSION}" ]; then
-  cat <<EOF >&2
-
-You may only source this script from within a Zsh session.
-
-Try running it instead: ./88 -c future
-
-EOF
-  return 1
-fi
-
-if ! [[ "${ZSH_EVAL_CONTEXT}" == 'toplevel' ]]; then
-  set -- "-q" "future"
-  alias exit='return'
-fi
-
-prog_name="${0:t}"
-prog_home="${0:A:h}"
-
-################################################################################
-# Help
-################################################################################
-
 #
-# Disallow sudo, in order to keep the space-time continuum intact.
+# Only allow sourcing this script from Zsh.
 #
 
-(( EUID == 0 )) && {
-cat <<EOF >&2
-
-${prog_name}: An encounter with sudo could create a time paradox.
-
-The results of which could cause a chain reaction that would unravel the
-very fabric of the space-time continuum and destroy the entire universe!
-
-... Granted, that's the worst-case scenario. The destruction however
-might be limited merely to our own galaxy.
-
-EOF
-} && exit 1
-
-#
-# Are we in the modern era?
-#
-
-min_zsh_version='5.0'
-if ! autoload -Uz is-at-least || ! is-at-least "${min_zsh_version}"; then
-  cat <<EOF >&2
-
-${prog_name}: Prehistoric Zsh version detected!
-Plutonium not invented until Zsh version: ${min_zsh_version}
-Please install at least version ${min_zsh_version} of Zsh.
-
-EOF
-  exit 1
+if [ -z $ZSH_VERSION ]; then
+  builtin echo
+  builtin echo 'You may only source this script from within a Zsh session.'
+  builtin echo
+  builtin echo 'Try running it instead: ./88 -c future'
+  builtin echo
+  builtin return 1
 fi
 
 #
-# Usage, or, What does this button do!?
+# Base helpers.
 #
 
-function usage {
-  cat <<EOF >&2
-
-usage: ${prog_name} [-option ...] [--] command
-
-options:
-  -s         System-wide (/etc/zshenv instead of ~/.zshenv).
-  -q         Quietly suppress theme music and ascii art.
-  -c         Change the default login shell to Zsh.
-
-commands:
-  future     Send your Zsh into the future!
-  past       Travel back to how things were, before DeLorean.
-  circuit    Generates a minimal circuit with passed name.
-
-EOF
-  exit 1
+@delorean.is-true () {
+  # case insensitive: "1", "y", "yes", "t", "true", "o", and "on".
+  [[ -n "${1}" && "${1}" == (1|[Yy]([Ee][Ss]|)|[Tt]([Rr][Uu][Ee]|)|[Oo]([Nn]|)) ]]
 }
 
+@delorean.is-true-yes-no () {
+  @delorean.is-true "${1}" && builtin print 'yes' || builtin print 'no'
+}
+
+@delorean.is-flag () {
+  [[ "${1[1]}" == '-' ]]
+}
+
+@delorean.is-flag-yes-no () {
+  @delorean.is-flag "${1}" && builtin print 'yes' || builtin print 'no'
+}
+
+@delorean.log () {
+  @delorean.is-true "${DELOREAN[debug]}" && builtin print "${DELOREAN[prog]}[${1}]: ${2}"
+}
+
+@delorean.log-info () {
+  @delorean.log 'info' "${1}"
+}
+
+@delorean.import () {
+  @delorean.is-true "${DELOREAN[dev]}" || builtin return 0
+
+  builtin local -a 'parts' 'middle'
+  builtin local 'front' 'back' 'trace' 'search' 'file'
+
+  parts=("${(s:/:)1}");
+  back="${parts[-1]}"
+  front="${parts[1]}"
+  middle=("${parts[@]:1:-1}")
+  trace="${funcfiletrace[1]%/*}"
+
+  case "${front}" in
+    ('.')
+      front="${trace}"
+    ;;
+    ('..')
+      front="${trace}/.."
+    ;;
+    ('~'|'@delorean')
+      front="${DELOREAN[lib]}"
+    ;;
+  esac
+
+  search="${front}/${(j:/:)middle[@]}/${back:-index}.zsh";
+
+  @delorean.log-info "${0} () => ${search}"
+
+  builtin setopt 'local_options' 'extended_glob' 'glob_subst'
+
+  for file (${search}(.)) builtin source "${file}"
+}
+
+#
+# Main.
+#
+
+builtin typeset -gAH 'DELOREAN' 'DELOREAN_TRUNK'
+DELOREAN[prog]="${0:t}"
+DELOREAN[dir]="${0:A:h}"
+DELOREAN[lib]="${DELOREAN[dir]}/lib"
+DELOREAN[min_zsh_version]='5.0'
+
+88 () {
+  builtin zparseopts -D -- '-dev=isDev' '-debug=isDebug'
+
+  DELOREAN[dev]="$(@delorean.is-flag-yes-no "${isDev}")"
+  DELOREAN[debug]="$(@delorean.is-flag-yes-no "${isDebug}")"
+
+  @delorean.log-info "${0} () => DELOREAN[dev] = ${DELOREAN[dev]}"
+  @delorean.log-info "${0} () => DELOREAN[debug] = ${DELOREAN[debug]}"
+
+  @delorean.import "~/exec/"
+  if @delorean.exec "${@[@]}"; then
+    # Start using the new DeLorean Zsh configuration!
+    builtin command login -fql "${LOGNAME}"
+    (( ${SHLVL} > 1 )) && builtin kill -9 "${PPID}"
+  else
+    builtin return "${?}"
+  fi
+}
+
+if [[ "${ZSH_EVAL_CONTEXT}" == 'toplevel' ]]; then
+  88 "${@[@]}"
+else
+  #@delorean.import "@delorean/source/"
+  #@delorean.source
+fi
+
+builtin return
+
+# If running 88, user wants:
+#   - Uninstall zshenv.
+#   - Copy schematics and change shell.
+#   - Mark next login shell to rebuild after .z* or $fpath change.
+#   - Manage the centralized repository of user functions and aliases.
+#   - Enable or disable circuits or reorder.
+# If user is sourcing 88, shell wants:
+#   - Flatten fpath if 88 was ran.
+#   - Replace fpath with flattened location.
+#   - Load circuits in order.
+
 ################################################################################
-# Options
+# STDERR.
+################################################################################
+
+#
+# Zshenv messages.
+#
+
+function 'STDERR_ZSHENV_'\
+{\
+'REMOVE_ABORT',\
+'REVERT_'{'BEGIN','FAIL','END'}\
+}
+{case "${0/STDERR_ZSHENV_/}" in
+;;('REMOVE_ABORT') cat <<EOF >&2
+
+${_H_}Aborting removal of ${zshenv_loc}
+
+EOF
+;;('REVERT_BEGIN') cat <<EOF >&2
+
+${_H_}Reverting ${zshenv_loc} to its original state.
+
+EOF
+;;('REVERT_FAIL') cat <<EOF >&2
+
+${_H_}Failed to rewind the hands of time for ${zshenv_loc}
+
+EOF
+;;('REVERT_END') cat <<EOF >&2
+
+${_H_}Welcome to 1985.
+
+EOF
+esac}
+
+#
+# Change shell messages.
+#
+
+function 'STDERR_CHANGE_SHELL_'\
+{\
+'IDENTIFY_BEGIN',\
+'IDENTIFY_END',\
+'IDENTIFY_SKIP',\
+'BEGIN',\
+'END',\
+'SKIP',\
+'WRONG',\
+'EMPTY',\
+'FAIL',\
+'BOGUS',\
+'MANUAL',\
+'UNCHANGED',\
+'WARN',\
+}
+{case "${0/STDERR_CHANGE_SHELL_/}" in
+  ('IDENTIFY_BEGIN') cat <<EOF >&2
+
+${_H_}(1/2) Enter your password to identify the current default login shell.
+
+EOF
+;;('IDENTIFY_END') cat <<EOF >&2
+
+${_T_}IDENTIFIED the current default login shell as:
+${_I_}
+${_L_}${LOG_SHELL}
+
+EOF
+;;('IDENTIFY_SKIP') cat <<EOF >&2
+
+${_T_}${1:-SKIPPED} default login shell identification.
+${_I_}
+${_I_}Will assume your default login shell is the current shell:
+${_I_}
+${_L_}${LOG_SHELL}
+
+EOF
+;;('BEGIN') cat <<EOF >&2
+
+${_H_}(2/2) Enter your password to change your default login shell to Zsh.
+
+EOF
+;;('END') cat <<EOF >&2
+
+${_T_}CHANGED the default login shell to:
+${_I_}
+${_L_}${CHSH_ZSH}
+
+EOF
+;;('SKIP') cat <<EOF >&2
+
+${_T_}${1:-SKIPPED} default login shell change.
+${_I_}
+${_I_}To change it yourself, run the following command:
+${_I_}
+${_L_}chsh -s "${CHSH_ZSH}"
+
+EOF
+;;('WRONG') cat <<EOF >&2
+
+${_T_}Wrong password.
+${_I_}
+${_L_}Press CTRL-C to skip.
+
+EOF
+;;('EMPTY') cat <<EOF >&2
+
+${_T_}Empty password.
+${_I_}
+${_L_}Press CTRL-C to skip.
+
+EOF
+;;('FAIL') cat <<EOF >&2
+
+${_T_}Failure message:
+${_I_}
+${_L_}${1}
+
+EOF
+;;('BOGUS') cat <<EOF >&2
+
+${_T_}(2/2) Cannot change the default login shell!
+${_I_}
+${_I_}There is a bad Zsh entry in /etc/shells
+${_I_}
+${_L_}Please fix /etc/shells and try again.
+
+EOF
+;;('MANUAL') cat <<EOF >&2
+
+${_T_}(2/2) Cannot change the default login shell! 
+${_I_}
+${_I_}This system does not have chsh.
+${_I_}
+${_I_}Please manually change your default login shell to:
+${_I_}
+${_L_}${CHSH_ZSH}
+
+EOF
+;;('UNCHANGED') cat <<EOF >&2
+
+${_T_}(2/2) SKIPPED default login shell change.
+${_I_}
+${_I_}The default login shell is already Zsh:
+${_I_}
+${_L_}${LOG_SHELL}
+
+EOF
+esac}
+
+################################################################################
+# Options.
 ################################################################################
 
 #
@@ -95,154 +290,32 @@ zshenv_loc="${HOME}/.zshenv"
 # Get options.
 #
 
-while getopts ':sqc' opt; do
+while getopts ':sqc' 'opt'; do
   case "${opt}" in
-    (s)
+    ('s')
       zshenv_su='yes'
       zshenv_ext='system'
       zshenv_loc="/etc/zshenv"
     ;;
-    (q)
+    ('q')
       quiet='yes'
     ;;
-    (c)
+    ('c')
       change='yes'
     ;;
-    (:)
-      print "${prog_name}: option requires an argument: ${OPTARG}" >&2
+    (':')
+      print "${_H_}option requires an argument: ${OPTARG}" >&2
       usage
     ;;
-    ([?])
-      print "${prog_name}: unknown option: ${OPTARG}" >&2
+    ('[?]')
+      print "${_H_}unknown option: ${OPTARG}" >&2
       usage
     ;;
   esac
 done
-shift $((OPTIND - 1))
+shift $(( ${OPTIND} - 1 ))
 
 (( $# < 1 )) && usage
-
-################################################################################
-# Error strings.
-################################################################################
-
-#
-# Zshenv errors.
-#
-
-function STDERR_ZSHENV_{\
-HAS_BEEN_MODIFIED,\
-BACKUP_{PAST_CONFLICT,USER_ABORT},\
-SCHEMATIC_FAIL,\
-REMOVE_USER_ABORT,\
-REVERT_{BEGIN,FAIL,END}}
-{case "${0/STDERR_ZSHENV_/}" in
-  HAS_BEEN_MODIFIED) cat <<EOF >&2
-
-${zshenv_loc} has been modified since the last temporal displacement!
-
-Copy changes you intend to keep from:
-
-${zshenv_loc} -> ${prog_home}/ZDOTDIR/.zshenv
-
-Then remove ${zshenv_loc} and try again.
-
-EOF
-;;BACKUP_PAST_CONFLICT) cat <<EOF >&2
-
-Backup failed for ${zshenv_loc}. Move it away and try again.
-
-EOF
-;;BACKUP_USER_ABORT) cat <<EOF >&2
-
-
-${prog_name}: Aborting temporal displacement of ${zshenv_loc}
-
-EOF 
-;;SCHEMATIC_FAIL) cat <<EOF >&2
-
-Temporal displacement of ${zshenv_loc} has failed.
-
-EOF
-;;REMOVE_USER_ABORT) cat <<EOF >&2
-
-${prog_name}: Aborting removal of ${zshenv_loc}
-
-EOF
-;;REVERT_BEGIN) cat <<EOF >&2
-
-${prog_name}: Reverting ${zshenv_loc} to its original state.
-
-EOF
-;;REVERT_FAIL) cat <<EOF >&2
-
-Failed to rewind the hands of time for ${zshenv_loc}
-
-EOF
-;;REVERT_END) cat <<EOF >&2
-
-${prog_name}: Welcome to 1985.
-
-EOF
-esac}
-
-#
-# Change shell errors.
-#
-
-function STDERR_CHANGE_SHELL_{BEGIN,END,ABORT,WRONG,EMPTY,OTHER,BOGUS,MANUAL,UNCHANGED}
-{case "${0/STDERR_CHANGE_SHELL_/}" in
-  BEGIN) cat <<EOF >&2
-
-Time to change the default shell to Zsh!
-
-EOF
-;;END) cat <<EOF >&2
-
-Default login shell is now ${SHELL}
-
-EOF
-;;ABORT) cat <<EOF >&2
-
-Change of default login shell has been cancelled!
-To try again, run the following command at any time:
-    chsh -s "${CHSH_ZSH}"
-
-EOF
-;;WRONG) cat <<EOF >&2
-
-Wrong password. Press CTRL-C to cancel.
-
-EOF
-;;EMPTY) cat <<EOF >&2
-
-Empty password. Press CTRL-C to cancel.
-
-EOF
-;;OTHER) cat <<EOF >&2
-
-There was a problem changing the default login shell:
-
-${CHSH_ZSH_STDERR}
-
-EOF
-;;BOGUS) cat <<EOF >&2
-
-Cannot change default login shell automatically because there is a bad Zsh entry in /etc/shells.
-
-EOF
-;;MANUAL) cat <<EOF >&2
-
-Cannot change the default login shell because this system does not have chsh.
-Please manually change your default login shell to ${CHSH_ZSH}!
-
-EOF
-;;UNCHANGED) cat <<EOF >&2
-
-Default login shell is already ${SHELL}
-
-EOF
-esac}
 
 ################################################################################
 # Setup.
@@ -252,127 +325,85 @@ esac}
 # Function for using schematics.
 #
 
-function schematic {
-  local in="${prog_home}/schematic/$1" out="$2" su="$3"
+@delorean/install/schematic () {
+  local in="${prog_home}/schematic/$1"
+  local out="$2"
+  local su="$3"
+
   if ! [[ -f "${in}" ]]; then
-    cat <<EOF >&2
-
-Schematic file${in:+ "$1"} seems to have been lost in space and time!
-EOF
+    :delorean@stderr:schematic-missing "$1"
     return 1
   fi
+
   if [[ -s "${out}" ]]; then
-    cat <<EOF >&2
-
-Schematic destination ${out} conflicts with an existing file!
-EOF
+    :delorean@stderr:schematic-conflict "${out}"
     return 1
   fi
-  local schema="${"$(<"${in}")"//__ZDOTDIR__/"${prog_home}/ZDOTDIR"}"
+
+  # read in
+  local schema="${$(<"${in}")//__ZDOTDIR__/${prog_home}/ZDOTDIR}"
+
+  # write out
   print "${schema}" | ${su:+sudo} tee "${out}" >/dev/null
-  ${su:+sudo} zsh -c "zmodload zsh/attr; zsetattr ${out} 'epoch' $(stat -f '%m' ${out})" &>/dev/null
+
+  # set epoch attr
+  local mtime="$(zstat '+mtime' "${out}")"
+  ${su:+sudo} zsh -c "zmodload 'zsh/attr'; zsetattr ${out} 'epoch' ${mtime}" &>/dev/null
 }
 
-#
-# When did we last touch zshenv?
-#
-
-zmodload zsh/attr
-zgetattr "${zshenv_loc}" 'epoch' zshenv_epoch &>/dev/null
-zshenv_stat="$(stat -f "%m" "${zshenv_loc}" 2>/dev/null)"
-
 ################################################################################
-# Run
+# Run.
 ################################################################################
 
 case "$@" in
   
   #
-  # Attempt temporal displacement of zshenv.
-  #
-
-  (future)
-    # if zshenv already exists
-    if (( zshenv_stat )); then
-      # and was created by us
-      if (( zshenv_epoch )); then
-        # but has been tampered with
-        if (( zshenv_epoch != zshenv_stat )); then
-          STDERR_ZSHENV_HAS_BEEN_MODIFIED
-          exit 1
-        fi
-      # or, it was not created by us
-      elif read -q "?Backup ${zshenv_loc} and proceed [y/N]? " && print; then
-        [[ ! -s "${zshenv_loc}.past" ]] && ${zshenv_su:+sudo} mv -v "${zshenv_loc}"{,.past} || {
-          STDERR_ZSHENV_BACKUP_PAST_CONFLICT
-          exit 1
-        }
-      # or, the user chose to abort
-      else
-        STDERR_ZSHENV_BACKUP_USER_ABORT
-        exit 1
-      fi
-    fi
-
-    # perform displacement
-    [[ -f "${zshenv_loc}" ]] && ${zshenv_su:+sudo} rm "${zshenv_loc}"
-    if ! schematic "zshenv.${zshenv_ext}" "${zshenv_loc}" $zshenv_su; then
-      STDERR_ZSHENV_SCHEMATIC_FAIL
-      exit 1
-    fi
-
-    # perform optional displacement of user files
-    rcs=('.zshenv' '.zprofile' '.zshrc' '.zlogin' '.zlogout')
-    for rc ("$rcs[@]") schematic "${rc}" "${prog_home}/ZDOTDIR/${rc}" 2>/dev/null
-  ;;
-
-  #
   # Travel back to the past.
   #
 
-  (past)
-    if (( zshenv_stat )); then
-      if (( zshenv_epoch )); then
+  ('past')
+    if (( ${zshenv_mtime} )); then
+      if (( ${zshenv_epoch} )); then
 
-        if (( zshenv_epoch != zshenv_stat )); then
-          if ! read -q "?Remove ${zshenv_loc} even though it has unsaved changes [y/N]? " && print; then
-            STDERR_ZSHENV_REMOVE_USER_ABORT
-            exit 1
+        if (( ${zshenv_epoch} != ${zshenv_mtime} )); then
+          if ! read -q "?Remove ${zshenv_loc} even though it has unsaved changes [y/N]? "; then
+            STDERR_ZSHENV_REMOVE_ABORT
+            "${brake}" 1
           fi
           print
         fi
 
         if [[ -s "${zshenv_loc}.past" ]]; then
           STDERR_ZSHENV_REVERT_BEGIN
-          ${zshenv_su:+sudo} mv -f -v "${zshenv_loc}"{.past,}
+          ${zshenv_su:+sudo} mv -f -v "${zshenv_loc}"{'.past',}
         else
           ${zshenv_su:+sudo} rm "${zshenv_loc}"
         fi
 
         if (( $? != 0 )); then
           STDERR_ZSHENV_REVERT_FAIL
-          exit 1
+          "${brake}" 1
         fi
 
       fi
     fi
 
     STDERR_ZSHENV_REVERT_END
-    exit 0
+    return 0
   ;;
 
   #
   # Generate a minimal circuit using the passed name.
   #
 
-  (circuit*)
+  ('circuit'*)
     name="${@//circuit/}"
     cat <<EOF >&2
 
-${prog_name}: Generating a new circuit: ${name}
+${_H_}Generating a new circuit:${name}
 
 EOF
-  exit 0
+    "${brake}" 0
   ;;
 
   #
@@ -380,7 +411,6 @@ EOF
   #
 
   (*)
-    print "${prog_name}: unknown command: $@" >&2
     usage
   ;;
 esac
@@ -389,77 +419,130 @@ esac
 # Prompt user to use Zsh as default login shell?
 #
 
-if (( $+change )); then
-  if ! [[ "${SHELL}" =~ "zsh" ]]; then
-    if (( $+commands[chsh] )); then
-      STDERR_CHANGE_SHELL_BEGIN
+@delorean/install/identify-login-shell () {
+  local ssh_stdout
+  local temp_file="$(mktemp)" 
+
+  @delorean/install/identify-login-shell/stderr/begin
+
+  trap 'true' 'INT'
+  while true; do
+    ssh_stdout="$(
+      ssh localhost \
+      -o 'PreferredAuthentications=keyboard-interactive' \
+      -o 'NumberOfPasswordPrompts=1' \
+      -o 'PubkeyAuthentication=no'
+      -t 'echo $SHELL' 2>!"${temp_file}"
+    )"
+    ssh_error_code="$?"
+    ssh_stderr="$(<"${temp_file}")"
+
+    case "${ssh_error_code}" in
+      ('0')
+        if (( ${#ssh_stdout} > 2 )); then
+          DELOREAN[login_shell]="${ssh_stdout}"
+          @delorean/stderr/identify_login_shell_end
+        else
+          @delorean/stderr/identify_login_shell_skip 'FAILED'
+        fi
+        break
+      ;;
+      ('130')
+        # ssh returns 130 on CTRL-C
+        @delorean/stderr/login-shell-identify-skip
+        break
+      ;;
+      ('255')
+        case "${ssh_stderr}" in
+          (*'denied'*)
+            @delorean/stderr/wrong-password
+          ;;
+          (*)
+            @delorean/stderr/login-shell-identify-skip 'FAILED'
+            @delorean/stderr/failure-message "${ssh_stderr}"
+            break
+          ;;
+        esac
+      ;;
+      (*)
+        @delorean/stderr/wrong-password
+      ;;
+    esac
+  done
+  trap '-' 'INT'
+}
+
+if (( ${+change} )); then
+  @delorean/install/identify-login-shell
+
+  
+  if ! [[ "${LOG_SHELL}" =~ "zsh" ]]; then
+    if (( ${+commands[chsh]} )); then
+      _88_stderr_change_shell_begin
       CHSH_ZSH="$(grep /zsh$ /etc/shells | tail -1)"
-      if [ -n "$("$CHSH_ZSH" -c 'print "${ZSH_VERSION}"')" ]; then
-        trap 'true' INT
+      if [[ -n "$("${CHSH_ZSH}" -c 'print "${ZSH_VERSION}"')" ]]; then
+        trap 'true' 'INT'
         while true; do
           CHSH_ZSH_STDERR="$(chsh -s "${CHSH_ZSH}" 2>&1)"
-          case $? in
-            0)
-              STDERR_CHANGE_SHELL_END
-              SHELL="${CHSH_ZSH}"
+          case "$?" in
+            ('0')
+              _88_stderr_change_shell_end
+              LOG_SHELL="${CHSH_ZSH}"
               break
             ;;
-            130)
+            ('130')
               # chsh returns 130 on CTRL-C
-              STDERR_CHANGE_SHELL_ABORT
+              _88_stderr_change_shell_skip
               break
             ;;
-            *)
+            (*)
               case "${CHSH_ZSH_STDERR}" in
-                *Credentials*)
-                  STDERR_CHANGE_SHELL_WRONG
+                (*'Credentials'*)
+                  _88_stderr_change_shell_wrong
                 ;;
-                *Empty*)
-                  STDERR_CHANGE_SHELL_EMPTY
+                (*'Empty'*)
+                  _88_stderr_change_shell_empty
                 ;;
-                *)
-                  STDERR_CHANGE_SHELL_OTHER
+                (*)
+                  _88_stderr_change_shell_skip 'FAILED'
+                  _88_stderr_change_shell_fail "${CHSH_ZSH_STDERR}"
                   break
                 ;;
               esac
             ;;
           esac
         done
-        trap - INT
+        trap '-' 'INT'
       else
-        STDERR_CHANGE_SHELL_BOGUS
+        _88_stderr_change_shell_bogus
       fi
     else
-      STDERR_CHANGE_SHELL_MANUAL
+      _88_stderr_change_shell_manual
     fi
   else
-    STDERR_CHANGE_SHELL_UNCHANGED
+    _88_stderr_change_shell_unchanged
   fi
+fi
+
+#
+# Explain how to get up to speed if Zsh is not default login shell.
+#
+
+if ! [[ "${LOG_SHELL}" =~ "zsh" ]]; then
+  @DELOREAN-stderr-change-shell-explain
+  "${break}" 0
 fi
 
 #
 # Critical velocity has been reached (88 MPH)!
 #
 
-if (( ! $+quiet )); then
-  [[ "$(<"$prog_home/README.md")" =~ '```DeLorean(.*)```' ]] && print -f "%s\n" "${match[1]}"
-  if (( $+commands[afplay] )); then
-    afplay "$prog_home/.github/bttf.wav" &>/dev/null &
-  elif (( $+commands[aplay] )); then
-    aplay -t wav "$prog_home/.github/bttf.wav" &>/dev/null &
+if (( ! ${+quiet} )); then
+  [[ "$(<"${prog_home}/README.md")" =~ '```DeLorean(.*)```' ]] && print -f "%s\n" "${match[1]}"
+  if (( ${+commands[afplay]} )); then
+    afplay "${prog_home}/.github/bttf.wav" &>/dev/null &
+  elif (( ${+commands[aplay]} )); then
+    aplay -t 'wav' "${prog_home}/.github/bttf.wav" &>/dev/null &
   fi
 fi
 
-#
-# Compile all the main files for speed (run 88 again after editing these).
-#
-
-files=('.zlogin' '.zlogout' '.zprofile' '.zshenv' '.zshrc' 'engine.zsh' 'flux-capacitor.zsh')
-for file ("${files[@]}") zcompile -Uz "${prog_home}/ZDOTDIR/${file}"
-
-#
-# Start using the new DeLorean Zsh configuration!
-#
-
-unset ZDOTDIR ${(k)parameters[(I)DELOREAN_*]}
-exec zsh

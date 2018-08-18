@@ -3,11 +3,12 @@
 #
 
 ################################################################################
-# Sequence of DeLorean circuits (the order matters).
+# Sequence of DeLorean circuits (the order may matter for userland circuits).
 ################################################################################
 
-zstyle ':delorean:sequence' circuit \
+zstyle ':delorean:sequence' 'circuit' \
   'environment' \
+  'history-substring-search' \
   'editor' \
   'utility' \
   'history' \
@@ -15,7 +16,6 @@ zstyle ':delorean:sequence' circuit \
   'directory' \
   'completion' \
   'syntax-highlighting' \
-  'history-substring-search' \
   'git' \
   'hub' \
   'nvm' \
@@ -30,13 +30,13 @@ zstyle ':delorean:sequence' circuit \
 # Set the Zsh modules to load (man zshmodules).
 #
 
-# zstyle ':delorean:load' zmodule 'attr' 'stat'
+zstyle ':delorean:load' 'zmodule' 'attr' 'stat'
 
 #
 # Set the Zsh functions to load (man zshcontrib).
 #
 
-# zstyle ':delorean:load' zfunction 'add-zsh-hook' 'chpwd_recent_dirs' 'cdr'
+zstyle ':delorean:load' 'zfunction' 'add-zsh-hook' 'chpwd_recent_dirs' 'cdr'
 
 ################################################################################
 # General configuration.
@@ -46,13 +46,13 @@ zstyle ':delorean:sequence' circuit \
 # Set case-sensitivity for completion, history lookup, etc.
 #
 
-# zstyle ':delorean:*:*' case-sensitive 'yes'
+# zstyle ':delorean:*:*' 'case-sensitive' 'yes'
 
 #
 # Color output (auto set to 'no' on dumb terminals).
 #
 
-zstyle ':delorean:*:*' color 'yes'
+zstyle ':delorean:*:*' 'color' 'yes'
 
 ################################################################################
 # Fpath configuration.
@@ -66,7 +66,7 @@ zstyle ':delorean:*:*' color 'yes'
 #   https://github.com/zsh-delorean/DeLorean/wiki/FPATH-blacklist
 #
 
-zstyle ':delorean:fpath' blacklist \
+zstyle ':delorean:fpath' 'blacklist' \
   '_SUSEconfig' \
   '_a2ps' \
   '_a2utils' \
@@ -81,7 +81,6 @@ zstyle ':delorean:fpath' blacklist \
   'zcalc' \
   'zcalc-auto-insert' \
   'zed-set-file-name' \
-  'zed' \
   'ztodo'
 
 ################################################################################
@@ -92,13 +91,13 @@ zstyle ':delorean:fpath' blacklist \
 # Show dotfiles in tab completion.
 #
 
-zstyle ':delorean:circuit:completion' dotfiles 'yes'
+zstyle ':delorean:circuit:completion' 'dotfiles' 'yes'
 
 #
 # Set the completion files to whitelist.
 #
 
-zstyle ':delorean:circuit:completion' whitelist \
+zstyle ':delorean:circuit:completion' 'whitelist' \
   '_ag' \
   '_ansible' \
   '_vagrant'
@@ -111,19 +110,19 @@ zstyle ':delorean:circuit:completion' whitelist \
 # Set the key mapping style to 'emacs' or 'vi'.
 #
 
-zstyle ':delorean:circuit:editor' key-bindings 'vi'
+zstyle ':delorean:circuit:editor' 'key-bindings' 'vi'
 
 #
 # Auto convert .... to ../..
 #
 
-zstyle ':delorean:circuit:editor' dot-expansion 'yes'
+zstyle ':delorean:circuit:editor' 'dot-expansion' 'yes'
 
 #
 # Allow # comments on the interactive command line.
 #
 
-zstyle ':delorean:circuit:editor' comments 'yes'
+zstyle ':delorean:circuit:editor' 'comments' 'yes'
 
 ################################################################################
 # DeLorean git circuit.
@@ -133,7 +132,17 @@ zstyle ':delorean:circuit:editor' comments 'yes'
 # Ignore submodules when they are 'dirty', 'untracked', 'all', or 'none'.
 #
 
-# zstyle ':delorean:circuit:git:status:ignore' submodules 'all'
+# zstyle ':delorean:circuit:git:status:ignore' 'submodules' 'all'
+
+################################################################################
+# DeLorean nvm circuit.
+################################################################################
+
+#
+# Set location of NVM_DIR.
+#
+
+zstyle ':delorean:circuit:nvm' 'nvm-dir' "${HOME}/.nvm"
 
 ################################################################################
 # DeLorean history-substring-search circuit.
@@ -143,19 +152,19 @@ zstyle ':delorean:circuit:editor' comments 'yes'
 # Set the query found color.
 #
 
-# zstyle ':delorean:circuit:history-substring-search:color' found ''
+# zstyle ':delorean:circuit:history-substring-search:color' 'found' ''
 
 #
 # Set the query not found color.
 #
 
-# zstyle ':delorean:circuit:history-substring-search:color' not-found ''
+# zstyle ':delorean:circuit:history-substring-search:color' 'not-found' ''
 
 #
 # Set the search globbing flags.
 #
 
-# zstyle ':delorean:circuit:history-substring-search' globbing-flags ''
+# zstyle ':delorean:circuit:history-substring-search' 'globbing-flags' ''
 
 ################################################################################
 # DeLorean syntax-highlighting circuit.
@@ -163,7 +172,7 @@ zstyle ':delorean:circuit:editor' comments 'yes'
 
 # Set syntax highlighters.
 # By default, only the main highlighter is enabled.
-# zstyle ':delorean:circuit:syntax-highlighting' highlighters \
+# zstyle ':delorean:circuit:syntax-highlighting' 'highlighters' \
 #   'main' \
 #   'brackets' \
 #   'pattern' \
@@ -172,7 +181,7 @@ zstyle ':delorean:circuit:editor' comments 'yes'
 #   'root'
 #
 # Set syntax highlighting styles.
-# zstyle ':delorean:circuit:syntax-highlighting' styles \
+# zstyle ':delorean:circuit:syntax-highlighting' 'styles' \
 #   'builtin' 'bg=blue' \
 #   'command' 'bg=blue' \
 #   'function' 'bg=blue'
@@ -185,24 +194,24 @@ zstyle ':delorean:circuit:editor' comments 'yes'
 # Auto set the tab and window titles.
 #
 
-zstyle ':delorean:circuit:terminal' auto-title 'yes'
+zstyle ':delorean:circuit:terminal' 'auto-title' 'yes'
 
 #
 # Set the window title format.
 #
 
-zstyle ':delorean:circuit:terminal:window-title' format '%n@%m: %s'
+zstyle ':delorean:circuit:terminal:window-title' 'format' '%n@%m: %s'
 
 #
 # Set the tab title format.
 #
 
 function tab_title {
-  local pwd="${PWD/#$HOME/~}"
+  local pwd="${PWD/#${HOME}/~}"
 
-  if [[ "$pwd" == (#m)[/~] ]]; then
-    echo "$MATCH"
-    unset MATCH
+  if [[ "${pwd}" == (#m)[/~] ]]; then
+    echo "${MATCH}"
+    unset 'MATCH'
   else
     echo "${${${${(@j:/:M)${(@s:/:)pwd}##.#?}:h}%/}//\%/%%}/${${pwd:t}//\%/%%}"
   fi

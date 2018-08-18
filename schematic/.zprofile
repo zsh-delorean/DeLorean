@@ -28,7 +28,7 @@
 # Browser.
 #
 
-if [[ "${OSTYPE}" == darwin* ]]; then
+if [[ "${OSTYPE}" == 'darwin'* ]]; then
   export BROWSER='open'
 fi
 
