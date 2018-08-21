@@ -2,7 +2,7 @@
   @delorean.import '~/util/is-at-least/'
   @delorean.import './util/is-not-sudo/'
   @delorean.import './command/future/'
-  #@delorean.import './command/past/'
+  @delorean.import './command/past/'
   @delorean.import './stderr/usage'
 
   #
@@ -51,4 +51,6 @@
     ;;
 
   esac
+
+  builtin return 0
 }

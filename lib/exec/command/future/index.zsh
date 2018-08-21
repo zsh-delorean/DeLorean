@@ -2,8 +2,8 @@
   @delorean.import '../util/zshenv-vars/'
   @delorean.import './util/zshenv-displace/'
   @delorean.import './util/schematic/'
-  #@delorean.import './util/login-shell-identify/'
-  #@delorean.import './util/login-shell-change/'
+  @delorean.import './util/login-shell-identify/'
+  @delorean.import './util/login-shell-change/'
   @delorean.import './stderr/*'
 
   #
@@ -24,7 +24,6 @@
 
   @delorean.exec.command.future.util.zshenv-displace
   (( ${?} == 0 )) || builtin return 1
-  builtin return 5
 
   #
   # Use schematic to materialize any missing user files into ZDOTDIR (non-zero exit is OK).
@@ -54,10 +53,10 @@
   #
 
   DELOREAN[login_shell]="${SHELL}"
+  @delorean.log-info "${0} () => DELOREAN[login_shell] = ${DELOREAN[login_shell]}"
 
   if @delorean.is-flag "${isChsh}"; then
     @delorean.exec.command.future.util.login-shell-identify
-
     @delorean.exec.command.future.util.login-shell-change
   fi
 
@@ -85,4 +84,6 @@
       builtin command aplay -t 'wav' "${DELOREAN[dir]}/.github/bttf.wav" &>/dev/null &!
     fi
   fi
+
+  builtin return 0
 }

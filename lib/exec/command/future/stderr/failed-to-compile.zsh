@@ -2,7 +2,8 @@
   @delorean.import '~/util/stderr/padding'
   @delorean.util.stderr.padding
 
-  builtin local file="${1}"
+  builtin local 'file'
+  file="${1}"
 
 <<EOF >&2
 

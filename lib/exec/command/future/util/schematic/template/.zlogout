@@ -25,6 +25,7 @@
 
   # Print the farewell.
   print
-  print 'SEE YOU IN THE FUTURE!'
+  print 'If my calculations are correct, you will receive this letter'
+  print 'immediately after you saw the DeLorean struck by lightning.'
 
 } >&2

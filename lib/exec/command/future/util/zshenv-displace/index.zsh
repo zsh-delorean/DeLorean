@@ -1,9 +1,6 @@
 @delorean.exec.command.future.util.zshenv-displace () {
-  @delorean.import '../schematic/'
   @delorean.import './stderr/*'
-
-  builtin print 'REPLACE!'
-  builtin return 6
+  @delorean.import '../schematic/'
 
   #
   # Ensure temporal displacement of zshenv can be reversed.
@@ -21,7 +18,7 @@
     # or, it was not created by us
     elif read -q "?Backup ${DELOREAN[zshenv_loc]} and proceed [y/N]? " && print; then
       if ! [[ -s "${DELOREAN[zshenv_loc]}.past" ]]; then
-        ${DELOREAN[zshenv_su]:+sudo} builtin noglob command mv -v "${DELOREAN[zshenv_loc]}" "${DELOREAN[zshenv_loc]}.past"
+        ${DELOREAN[zshenv_su]:+'sudo'} builtin noglob command mv -v "${DELOREAN[zshenv_loc]}" "${DELOREAN[zshenv_loc]}.past"
       else
         @delorean.exec.command.future.util.zshenv-displace.stderr.backup-past-conflict
         builtin return 1
@@ -38,7 +35,7 @@
   #
 
   if [[ -f "${DELOREAN[zshenv_loc]}" ]]; then
-    ${DELOREAN[zshenv_su]:+sudo} builtin noglob command rm "${DELOREAN[zshenv_loc]}"
+    ${DELOREAN[zshenv_su]:+'sudo'} builtin noglob command rm "${DELOREAN[zshenv_loc]}"
   fi
 
   #
@@ -50,4 +47,6 @@
     @delorean.exec.command.future.util.zshenv-displace.stderr.schematic-fail
     builtin return 1
   fi
+
+  builtin return 0
 }

@@ -17,6 +17,6 @@
 
 export DELOREAN_ZSHENV="${HOME}/.zshenv"
 
-export ZDOTDIR="__ZDOTDIR__"
+export ZDOTDIR='__ZDOTDIR__'
 
 source "${ZDOTDIR}/.zshenv"
