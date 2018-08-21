@@ -29,10 +29,10 @@
   # Use schematic to materialize any missing user files into ZDOTDIR (non-zero exit is OK).
   #
 
-  builtin local 'user_files'
+  builtin local -a 'user_files'
   user_files=('.zshenv' '.zprofile' '.zshrc' '.zlogin' '.zlogout')
 
-  for file in ("${user_files[@]}"); do
+  for file in "${user_files[@]}"; do
     @delorean.exec.command.future.util.schematic "${file}" "${DELOREAN[dir]}/ZDOTDIR/${file}" 2>/dev/null
   done
 
@@ -40,7 +40,7 @@
   # Compile known ZDOTDIR files (run 88 again after editing any of these).
   #
 
-  for file in ("${user_files[@]}" 'flux-capacitor.zsh'); do
+  for file in "${user_files[@]}" 'flux-capacitor.zsh'; do
     file="${DELOREAN[dir]}/ZDOTDIR/${file}"
 
     if ! builtin zcompile -Uz "${file}"; then

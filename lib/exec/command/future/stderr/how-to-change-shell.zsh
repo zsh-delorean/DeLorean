@@ -1,6 +1,6 @@
-@delorean.exec.command.future.how-to-change-shell () {
-  @delorean.import '~/util/stderr/padding'
-  @delorean.util.stderr.padding
+@delorean.exec.command.future.stderr.how-to-change-shell () {
+  @delorean.import '~/util/stderr-prefix/'
+  @delorean.util.stderr-prefix
 
 <<EOF >&2
 

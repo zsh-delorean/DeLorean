@@ -1,6 +1,6 @@
 @delorean.exec.command.future.util.login-shell-identify.stderr.end () {
-  @delorean.import '~/util/stderr/padding'
-  @delorean.util.stderr.padding
+  @delorean.import '~/util/stderr-prefix/'
+  @delorean.util.stderr-prefix
 
 <<EOF >&2
 

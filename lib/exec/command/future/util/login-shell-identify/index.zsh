@@ -1,4 +1,6 @@
 @delorean.exec.command.future.util.login-shell-identify () {
+  @delorean.import '~/exec/command/stderr/password-wrong'
+  @delorean.import '~/exec/command/stderr/failure-message'
   @delorean.import './stderr/*'
 
   builtin local 'temp_file' 'ssh_stdout' 'ssh_error_code' 'ssh_stderr' 'return_code'
@@ -13,7 +15,7 @@
       ssh localhost \
       -o 'PreferredAuthentications=keyboard-interactive' \
       -o 'NumberOfPasswordPrompts=1' \
-      -o 'PubkeyAuthentication=no'
+      -o 'PubkeyAuthentication=no' \
       -t 'echo $SHELL' 2>!"${temp_file}"
     )"
     ssh_error_code="${?}"

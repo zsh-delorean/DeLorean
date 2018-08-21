@@ -1,4 +1,7 @@
 @delorean.exec.command.future.util.login-shell-change () {
+  @delorean.import '~/exec/command/stderr/password-empty'
+  @delorean.import '~/exec/command/stderr/password-wrong'
+  @delorean.import '~/exec/command/stderr/failure-message'
   @delorean.import './stderr/*'
 
   builtin local 'chsh_zsh' 'chsh_zsh_stderr' 'return_code'

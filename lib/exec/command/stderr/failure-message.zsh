@@ -1,6 +1,6 @@
 @delorean.exec.command.stderr.failure-message () {
-  @delorean.import '~/util/stderr/padding'
-  @delorean.util.stderr.padding
+  @delorean.import '~/util/stderr-prefix/'
+  @delorean.util.stderr-prefix
 
   builtin local 'message'
   message="${1}"

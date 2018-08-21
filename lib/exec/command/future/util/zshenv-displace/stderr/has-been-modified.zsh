@@ -1,6 +1,6 @@
-@delorean.exec.command.future.util.zshenv-displace.has-been-modified () {
-  @delorean.import '~/util/stderr/padding'
-  @delorean.util.stderr.padding
+@delorean.exec.command.future.util.zshenv-displace.stderr.has-been-modified () {
+  @delorean.import '~/util/stderr-prefix/'
+  @delorean.util.stderr-prefix
 
 <<EOF >&2
 

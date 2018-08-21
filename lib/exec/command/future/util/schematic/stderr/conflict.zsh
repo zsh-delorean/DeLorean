@@ -1,6 +1,6 @@
 @delorean.exec.command.future.util.schematic.stderr.conflict () {
-  @delorean.import '~/util/stderr/padding'
-  @delorean.util.stderr.padding
+  @delorean.import '~/util/stderr-prefix/'
+  @delorean.util.stderr-prefix
 
   builtin local 'out'
   out="${1}"

@@ -1,6 +1,6 @@
-@delorean.exec.command.future.util.zshenv-displace.schematic-fail () {
-  @delorean.import '~/util/stderr/padding'
-  @delorean.util.stderr.padding
+@delorean.exec.command.future.util.zshenv-displace.stderr.schematic-fail () {
+  @delorean.import '~/util/stderr-prefix/'
+  @delorean.util.stderr-prefix
 
 <<EOF >&2
 

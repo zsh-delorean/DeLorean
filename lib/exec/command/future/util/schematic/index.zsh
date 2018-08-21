@@ -3,7 +3,7 @@
 
   builtin local 'in' 'out' 'su' 'schema' 'mtime'
 
-  in="${DELOREAN[dir]}/template/${1}"
+  in="${DELOREAN[dir]}/lib/exec/command/future/util/schematic/template/${1}"
   out="${2}"
   su="${3}"
 
@@ -20,10 +20,10 @@
   fi
 
   #
-  # Read in.
+  # Read in and replace any __ZDOTDIR__ strings with absolute location.
   #
 
-  schema="${$(<"${in}")//__ZDOTDIR__/${prog_home}/ZDOTDIR}"
+  schema="${$(<"${in}")//__ZDOTDIR__/${DELOREAN[dir]}/ZDOTDIR}"
 
   #
   # Write out.
