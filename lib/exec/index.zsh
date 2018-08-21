@@ -17,8 +17,11 @@
   #
 
   builtin local 'cmd'
-  cmd="${1}"
-  builtin shift
+  
+  if (( ${#} > 0 )); then
+    cmd="${1}"
+    builtin shift
+  fi
 
   #
   # Handle command.
@@ -48,9 +51,10 @@
 
     (*)
       @delorean.exec.stderr.usage
+      builtin return 1
     ;;
 
   esac
 
-  builtin return 0
+  builtin return "${?}"
 }

@@ -1,6 +1,13 @@
 @delorean.exec.command.past() {
   @delorean.import './stderr/*'
+  @delorean.import '../util/zshenv-vars/'
   @delorean.import './util/zshenv-revert/'
+
+  #
+  # Parse command options.
+  #
+
+  builtin zparseopts -D -- 's=isSystem'
 
   #
   # Set zshenv variables.

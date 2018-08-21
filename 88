@@ -76,7 +76,73 @@ fi
 }
 
 #
-# Main.
+# Main function for executing commands.
+#
+
+88 () {
+  #
+  # Parse command options.
+  #
+
+  builtin zparseopts -D -- '-dev=isDev' '-debug=isDebug'
+
+  #
+  # Set variables and log values.
+  #
+
+  DELOREAN[dev]="$(@delorean.is-flag-yes-no "${isDev}")"
+  DELOREAN[debug]="$(@delorean.is-flag-yes-no "${isDebug}")"
+
+  @delorean.log-info "${0} () => DELOREAN[dev] = ${DELOREAN[dev]}"
+  @delorean.log-info "${0} () => DELOREAN[debug] = ${DELOREAN[debug]}"
+
+  #
+  # Now it is safe to use import.
+  #
+
+  @delorean.import '~/exec/'
+
+  #
+  # Execute the passed command and flags.
+  #
+
+  if @delorean.exec "${@[@]}"; then
+    #
+    # Return now if STDIN is not a TTY.
+    #
+
+    if ! [[ -t 0 || -p /dev/stdin ]]; then
+      builtin return 0
+    fi
+
+    #
+    # Start using the new DeLorean Zsh configuration!
+    #
+
+    builtin command login -fql "${LOGNAME}"
+
+    #
+    # End the parent process when the above subprocess exits.
+    #
+
+    # When called like: ./88
+    if (( ${SHLVL} > 1 )); then
+      builtin kill -9 "${PPID}"
+    fi
+
+    # When called like: 88
+    exit 0
+  else
+    #
+    # Return with the error code if the command failed.
+    #
+
+    builtin return "${?}"
+  fi
+}
+
+#
+# Shared global associative arrays (hidden).
 #
 
 builtin typeset -gAH 'DELOREAN' 'DELOREAN_TRUNK'
@@ -85,33 +151,32 @@ DELOREAN[dir]="${0:A:h}"
 DELOREAN[lib]="${DELOREAN[dir]}/lib"
 DELOREAN[min_zsh_version]='5.0'
 
-88 () {
-  builtin zparseopts -D -- '-dev=isDev' '-debug=isDebug'
-
-  DELOREAN[dev]="$(@delorean.is-flag-yes-no "${isDev}")"
-  DELOREAN[debug]="$(@delorean.is-flag-yes-no "${isDebug}")"
-
-  @delorean.log-info "${0} () => DELOREAN[dev] = ${DELOREAN[dev]}"
-  @delorean.log-info "${0} () => DELOREAN[debug] = ${DELOREAN[debug]}"
-
-  @delorean.import "~/exec/"
-  if @delorean.exec "${@[@]}"; then
-    # Start using the new DeLorean Zsh configuration!
-    builtin command login -fql "${LOGNAME}"
-    (( ${SHLVL} > 1 )) && builtin kill -9 "${PPID}"
-  else
-    builtin return "${?}"
-  fi
-}
+#
+# Main entry point will depend on how this script was invoked.
+#
+# Called:
+#   - Like: ./88 --dev future -c
+#   - Execute passed command with flags (future/past/etc).
+#
+# Sourced:
+#   - Like: source "${ZDOTDIR}/88"
+#   - Optimize and enhance the sourcing Zsh instance.
+#
 
 if [[ "${ZSH_EVAL_CONTEXT}" == 'toplevel' ]]; then
+   # Called
   88 "${@[@]}"
 else
-  #@delorean.import "@delorean/source/"
-  #@delorean.source
+  # Sourced
+  @delorean.import "~/source/"
+  @delorean.source
 fi
 
-builtin return
+#
+# Return the final error code.
+#
+
+builtin return "${?}"
 
 # If running 88, user wants:
 #   - Uninstall zshenv.
