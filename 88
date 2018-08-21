@@ -146,7 +146,6 @@ fi
 #
 
 builtin typeset -gAH 'DELOREAN' 'DELOREAN_TRUNK'
-DELOREAN[prog]="${0:t}"
 DELOREAN[dir]="${0:A:h}"
 DELOREAN[lib]="${DELOREAN[dir]}/lib"
 DELOREAN[min_zsh_version]='5.0'
@@ -165,9 +164,11 @@ DELOREAN[min_zsh_version]='5.0'
 
 if [[ "${ZSH_EVAL_CONTEXT}" == 'toplevel' ]]; then
    # Called
+  DELOREAN[prog]='88'
   88 "${@[@]}"
 else
   # Sourced
+  DELOREAN[prog]='DeLorean'
   @delorean.import "~/source/"
   @delorean.source
 fi
