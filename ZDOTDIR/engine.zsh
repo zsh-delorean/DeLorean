@@ -43,7 +43,7 @@ function epoch-{exists,uptodate,update} {
     # Checks if the file has the "epoch" attribute.
     #
 
-    'exists')
+    ('exists')
       zgetattr "$1" 'epoch' 'epoch_exists' &>/dev/null && return 0 || return 1
     ;;
 
@@ -51,7 +51,7 @@ function epoch-{exists,uptodate,update} {
     # Compares the "epoch" attribute of two files.
     #
 
-    'uptodate')
+    ('uptodate')
       zgetattr "$1" 'epoch' 'passed_epoch' &>/dev/null || return 1
       return $(( DELOREAN_EPOCH != passed_epoch ))
     ;;
@@ -60,7 +60,7 @@ function epoch-{exists,uptodate,update} {
     # Updates the "epoch" attribute of a file.
     #
 
-    'update')
+    ('update')
       zsetattr "$1" 'epoch' "${DELOREAN_EPOCH}"
     ;;
   esac

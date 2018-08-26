@@ -1,14 +1,17 @@
 #
-# This device is what makes time travel possible!
+# Tweaking the flux capacitor makes DeLorean travel to an alternate future!
+#
+# Get DeLorean up to speed by running "88 future" after making any tweaks here.
 #
 
 ################################################################################
-# Sequence of DeLorean circuits (the order may matter for userland circuits).
+# Sequence of DeLorean circuits (order should not matter for core circuits).
 ################################################################################
 
 zstyle ':delorean:sequence' 'circuit' \
   'environment' \
   'history-substring-search' \
+  'iterm2' \
   'editor' \
   'utility' \
   'history' \
@@ -55,7 +58,7 @@ zstyle ':delorean:load' 'zfunction' 'add-zsh-hook' 'chpwd_recent_dirs' 'cdr'
 zstyle ':delorean:*:*' 'color' 'yes'
 
 ################################################################################
-# Fpath configuration.
+# Configuration for fpath.
 ################################################################################
 
 #
@@ -206,7 +209,7 @@ zstyle ':delorean:circuit:terminal:window-title' 'format' '%n@%m: %s'
 # Set the tab title format.
 #
 
-function tab_title {
+tab_title () {
   local pwd="${PWD/#${HOME}/~}"
 
   if [[ "${pwd}" == (#m)[/~] ]]; then
@@ -217,4 +220,4 @@ function tab_title {
   fi
 }
 
-zstyle -e ':delorean:circuit:terminal:tab-title' format 'reply=$(tab_title)'
+zstyle -e ':delorean:circuit:terminal:tab-title' 'format' 'reply=$(tab_title)'

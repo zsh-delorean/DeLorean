@@ -19,4 +19,4 @@ export DELOREAN_ZSHENV="${HOME}/.zshenv"
 
 export ZDOTDIR='__ZDOTDIR__'
 
-source "${ZDOTDIR}/.zshenv"
+[[ -s "${ZDOTDIR}/.zshenv" ]] && source "${ZDOTDIR}/.zshenv"

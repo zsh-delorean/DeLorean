@@ -42,6 +42,12 @@ fi
   @delorean.log 'info' "${1}"
 }
 
+@delorean.log-DELOREAN () {
+  for key value in "${(kv)DELOREAN[@]}"; do
+    @delorean.log-info "DELOREAN[${key}] => ${value}"
+  done
+}
+
 @delorean.import () {
   @delorean.is-true "${DELOREAN[dev]}" || builtin return 0
 
@@ -81,63 +87,80 @@ fi
 
 88 () {
   #
-  # Parse command options.
+  # Parse universal options.
   #
 
   builtin zparseopts -D -- '-dev=isDev' '-debug=isDebug'
 
-  #
-  # Set variables and log values.
-  #
-
   DELOREAN[dev]="$(@delorean.is-flag-yes-no "${isDev}")"
   DELOREAN[debug]="$(@delorean.is-flag-yes-no "${isDebug}")"
 
-  @delorean.log-info "${0} () => DELOREAN[dev] = ${DELOREAN[dev]}"
-  @delorean.log-info "${0} () => DELOREAN[debug] = ${DELOREAN[debug]}"
-
   #
-  # Now it is safe to use import.
+  # Main entry point depends on invokation method.
   #
 
-  @delorean.import '~/exec/'
-
-  #
-  # Execute the passed command and flags.
-  #
-
-  if @delorean.exec "${@[@]}"; then
+  if [[ "${ZSH_EVAL_CONTEXT}" == 'toplevel' ]]; then
     #
-    # Return now if STDIN is not a TTY.
+    # Command invokation:
+    #   - F.ex: ./88 --dev future -c
+    #   - Execute the passed command with flags.
     #
 
-    if ! [[ -t 0 || -p /dev/stdin ]]; then
-      builtin return 0
+    DELOREAN[prog]='88'
+    @delorean.log-DELOREAN
+
+    #
+    # Execute the requested command and pass along any flags.
+    #
+
+    @delorean.import '~/exec/'
+
+    if @delorean.exec "${@[@]}"; then
+      #
+      # Don't start any subprocesses if STDIN is not a TTY.
+      #
+
+      if ! [[ -t 0 || -p /dev/stdin ]]; then
+        builtin return 0
+      fi
+
+      #
+      # Start using the new DeLorean Zsh configuration!
+      #
+
+      builtin command login -fql "${LOGNAME}"
+
+      #
+      # End the parent process when the above subprocess exits.
+      #
+
+      # When called like: ./88
+      if (( ${SHLVL} > 1 )); then
+        builtin kill -9 "${PPID}"
+      fi
+
+      # When called like: 88
+      builtin exit 0
+    else
+      #
+      # The command failed; return the error code.
+      #
+
+      builtin return "${?}"
     fi
-
-    #
-    # Start using the new DeLorean Zsh configuration!
-    #
-
-    builtin command login -fql "${LOGNAME}"
-
-    #
-    # End the parent process when the above subprocess exits.
-    #
-
-    # When called like: ./88
-    if (( ${SHLVL} > 1 )); then
-      builtin kill -9 "${PPID}"
-    fi
-
-    # When called like: 88
-    exit 0
   else
     #
-    # Return with the error code if the command failed.
+    # Source invokation:
+    #   - F.ex: source "${ZDOTDIR}/88"
+    #   - Do any necessary recompilation.
+    #   - Modify the sourcing Zsh instance.
     #
 
-    builtin return "${?}"
+    DELOREAN[prog]='DeLorean'
+    @delorean.log-DELOREAN
+
+    @delorean.import "~/source/"
+    @delorean.source
   fi
 }
 
@@ -146,45 +169,65 @@ fi
 #
 
 builtin typeset -gAH 'DELOREAN' 'DELOREAN_TRUNK'
-DELOREAN[dir]="${0:A:h}"
-DELOREAN[lib]="${DELOREAN[dir]}/lib"
+
 DELOREAN[min_zsh_version]='5.0'
 
+# Installer will clone zsh-delorean/delorean to:
+#   ~/.delorean
 #
-# Main entry point will depend on how this script was invoked.
+#   ~/.delorean/delorean/{build.zsh,hood,.github,.git,.gitignore}
+#   ~/.delorean/circuits/{.git,.gitmodules,circuit-git,circuit-editor}
 #
-# Called:
-#   - Like: ./88 --dev future -c
-#   - Execute passed command with flags (future/past/etc).
+#   ~/.zplugin/
+
+# Build hood/88.zsh -> 88
+#   How will pass along --dev ?
+#   DELOREAN[dir]=${DELOREAN_LOCATION:-"${HOME}/.delorean"}
+
+# 88:
+#   COULD link to /usr/local/bin/88
+#   Better to add to ~/.zshenv as DELOREAN_LOCATION/88 (chicken/egg?)
+
+# ZDOTDIR/.zshrc
+#   source DELOREAN_LOCATION/88
+
+# Set this in future command
+#   -z  -> Choose a directory...
+#   -zdotdir::zdotdir
+#   --zdotdir '~/ZDOTDIR'
+# elif (( ${+DELOREAN_ZSHENV} ))
+DELOREAN[zdotdir]="${ZDOTDIR}"
+# else
+DELOREAN[zdotdir]="${HOME}/.config/ZDOTDIR"
+
+# Move these into import method
+DELOREAN[dir]="${${funcsourcetrace[1]%:*}:A:h}"
+DELOREAN[lib]="${DELOREAN[dir]}/lib"
+# Import schematic templates as functions...
+
 #
-# Sourced:
-#   - Like: source "${ZDOTDIR}/88"
-#   - Optimize and enhance the sourcing Zsh instance.
+# Get DeLorean up to speed!
 #
 
-if [[ "${ZSH_EVAL_CONTEXT}" == 'toplevel' ]]; then
-   # Called
-  DELOREAN[prog]='88'
-  88 "${@[@]}"
-else
-  # Sourced
-  DELOREAN[prog]='DeLorean'
-  @delorean.import "~/source/"
-  @delorean.source
-fi
-
-#
-# Return the final error code.
-#
-
+88 "${@[@]}"
 builtin return "${?}"
 
+# 88 is not necessarily in same directory as ZDOTDIR
+#
+# .zshenv =__ZDOTDIR__=> ~/.config/ZDOTDIR
+# ~/.config/ZDOTDIR/.zshrc =source=> /usr/local/bin/88 -> ~/.delorean/88
+# ~/.delorean/88 =source=> ~/.config/ZDOTDIR/flux-capacitor.zsh
+# ~/.delorean/88 =circuit=> ~/.config/ZDOTDIR/circuits/environment/circuit-environment
+#
+# -z ... Specify location of ZDOTDIR (~/.config/ZDOTDIR by default)
+# DELOREAN[zdotdir]='~/.config/ZDOTDIR'
+
 # If running 88, user wants:
-#   - Uninstall zshenv.
+#   - Restore old zshenv.
 #   - Copy schematics and change shell.
 #   - Mark next login shell to rebuild after .z* or $fpath change.
-#   - Manage the centralized repository of user functions and aliases.
-#   - Enable or disable circuits or reorder.
+#   - Manage the centralized repository of user functions and aliases?
+#   - Enable or disable circuits or reorder?
 # If user is sourcing 88, shell wants:
 #   - Flatten fpath if 88 was ran.
 #   - Replace fpath with flattened location.
@@ -192,7 +235,8 @@ builtin return "${?}"
 
 # TODO/CONSIDER:
 #   - Location after install (compare to zulu)
-#   - exec? login... what about function call 88 when loaded in shell? might need to add back || exit 0
+#     - Zulu cannot load custom repos
+#   - login... what about function call 88 when loaded in shell? might need to add back || exit 0
 #     - Headless option... --skip-login if ! [ -t 0 ] || [ -p /dev/stdin ]; then
 #   - zplugin
 #   - Lazy load triggers

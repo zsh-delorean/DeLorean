@@ -3,7 +3,7 @@
 
   builtin local 'in' 'out' 'su' 'schema' 'mtime'
 
-  in="${DELOREAN[dir]}/lib/exec/command/future/util/schematic/template/${1}"
+  in="${DELOREAN[lib]}/exec/command/future/util/schematic/template/${1}"
   out="${2}"
   su="${3}"
 
