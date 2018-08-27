@@ -10,7 +10,7 @@
   # Parse command options.
   #
 
-  builtin zparseopts -M -D -E -A opts -- \
+  builtin zparseopts -A opts -D -E -M -- \
     's=-system' '-system' \
     'c=-chsh' '-chsh' \
     'q=-quiet' '-quiet' \

@@ -7,7 +7,7 @@
 
   temp_file="$(mktemp)" 
 
-  @delorean.exec.command.future.util.login-shell-identify.stderr.begin
+  ${0}.stderr.begin
 
   builtin trap 'true' 'INT'
   while true; do
@@ -28,16 +28,16 @@
           return_code='0'
           DELOREAN[login_shell]="${ssh_stdout}"
           @delorean.log-info "${0} () => DELOREAN[login_shell] = ${DELOREAN[login_shell]}"
-          @delorean.exec.command.future.util.login-shell-identify.stderr.end
+          ${0}.stderr.end
         else
-          @delorean.exec.command.future.util.login-shell-identify.stderr.skip 'FAILED'
+          ${0}.stderr.skip 'FAILED'
         fi
         builtin break
       ;;
       ('130')
         # ssh returns 130 on CTRL-C
         return_code='130'
-        @delorean.exec.command.future.util.login-shell-identify.stderr.skip
+        ${0}.stderr.skip
         builtin break
       ;;
       ('255')
@@ -46,7 +46,7 @@
             @delorean.exec.command.stderr.password-wrong
           ;;
           (*)
-            @delorean.exec.command.future.util.login-shell-identify.stderr.skip 'FAILED'
+            ${0}.stderr.skip 'FAILED'
             @delorean.exec.command.stderr.failure-message "${ssh_stderr}"
             builtin break
           ;;

@@ -31,7 +31,7 @@ License
 
 [![MIT License](https://img.shields.io/:license-MIT-blue.svg?)](https://tldrlegal.com/l/mit)
 
-Copyright &copy; 2015-2016 Zsh DeLorean contributors.
+Copyright &copy; 2015-2018 Zsh DeLorean contributors.
 
 Copyright &copy; 2011-2015 Sorin Ionescu and contributors.
 

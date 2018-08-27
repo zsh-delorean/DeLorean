@@ -7,7 +7,7 @@
   out="${2}"
   su="${3}"
 
-  @delorean.log-info "${0} () => Materialize ${in} to ${out} ${su:+'with sudo.'}"
+  @delorean.log-info "${0} () => Materialize ${out} from ${in} ${su:+'with sudo.'}"
 
   cmd="${0}.stdout--${in}"
   @delorean.import "./stdout/${in}"
@@ -23,7 +23,7 @@
   fi
 
   #
-  # Read in and replace any strings with absolute location.
+  # Read in and replace multiple with absolute location.
   #
 
   schema="$("${cmd}")"

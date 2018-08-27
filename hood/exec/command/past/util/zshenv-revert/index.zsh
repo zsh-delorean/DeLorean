@@ -10,21 +10,21 @@
 
       if (( ${DELOREAN[zshenv_epoch]} != ${DELOREAN[zshenv_mtime]} )); then
         if ! builtin read -q "?Remove ${DELOREAN[zshenv_loc]} even though it has unsaved changes [y/N]? "; then
-          @delorean.exec.command.past.util.zshenv-revert.stderr.abort
+          ${0}.stderr.abort
           builtin return 1
         fi
         builtin print
       fi
 
       if [[ -s "${DELOREAN[zshenv_loc]}.past" ]]; then
-        @delorean.exec.command.past.util.zshenv-revert.stderr.begin
+        ${0}.stderr.begin
         ${DELOREAN[zshenv_su]:+'sudo'} builtin noglob command mv -f -v "${DELOREAN[zshenv_loc]}.past" "${DELOREAN[zshenv_loc]}"
       else
         ${DELOREAN[zshenv_su]:+'sudo'} builtin noglob command rm "${DELOREAN[zshenv_loc]}"
       fi
 
       if (( ${?} != 0 )); then
-        @delorean.exec.command.past.util.zshenv-revert.stderr.fail
+        ${0}.stderr.fail
         builtin return 1
       fi
 

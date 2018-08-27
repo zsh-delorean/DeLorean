@@ -12,7 +12,7 @@
     return_code='1'
 
     if (( ${+commands[chsh]} )); then
-      @delorean.exec.command.future.util.login-shell-change.stderr.begin
+      ${0}.stderr.begin
 
       chsh_zsh="$(grep '/zsh$' '/etc/shells' | tail '-1')"
 
@@ -25,13 +25,13 @@
             ('0')
               DELOREAN[login_shell]="${chsh_zsh}"
               @delorean.log-info "${0} () => DELOREAN[login_shell] = ${DELOREAN[login_shell]}"
-              @delorean.exec.command.future.util.login-shell-change.stderr.end
+              ${0}.stderr.end
               return_code='0'
               builtin break
             ;;
             ('130')
               # chsh returns 130 on CTRL-C
-              @delorean.exec.command.future.util.login-shell-change.stderr.skip "${chsh_zsh}"
+              ${0}.stderr.skip "${chsh_zsh}"
               return_code='130'
               builtin break
             ;;
@@ -44,7 +44,7 @@
                   @delorean.exec.command.stderr.password-empty
                 ;;
                 (*)
-                  @delorean.exec.command.future.util.login-shell-change.stderr.skip "${chsh_zsh}" 'FAILED'
+                  ${0}.stderr.skip "${chsh_zsh}" 'FAILED'
                   @delorean.exec.command.stderr.failure-message "${chsh_zsh_stderr}"
                   builtin break
                 ;;
@@ -54,13 +54,13 @@
         done
         builtin trap '-' 'INT'
       else
-        @delorean.exec.command.future.util.login-shell-change.stderr.bogus
+        ${0}.stderr.bogus
       fi
     else
-      @delorean.exec.command.future.util.login-shell-change.stderr.manual "${chsh_zsh}"
+      ${0}.stderr.manual "${chsh_zsh}"
     fi
   else
-    @delorean.exec.command.future.util.login-shell-change.stderr.unchanged
+    ${0}.stderr.unchanged
   fi
 
   builtin return "${return_code}"

@@ -9,7 +9,7 @@
   # Ensure a safe execution environment.
   #
 
-  @delorean.exec.util.is-not-sudo || builtin return 1
+  ${0}.util.is-not-sudo || builtin return 1
   @delorean.util.is-at-least || builtin return 1
 
   #
@@ -34,7 +34,7 @@
     #
 
     ('future')
-      @delorean.exec.command.future "${@[@]}"
+      ${0}.command.future "${@[@]}"
     ;;
 
     #
@@ -42,7 +42,7 @@
     #
 
     ('past')
-      @delorean.exec.command.past "${@[@]}"
+      ${0}.command.past "${@[@]}"
     ;;
 
     #
@@ -50,7 +50,7 @@
     #
 
     (*)
-      @delorean.exec.stderr.usage
+      ${0}.stderr.usage
       builtin return 1
     ;;
 

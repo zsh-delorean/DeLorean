@@ -17,26 +17,8 @@ fi
 # Base helpers.
 #
 
-@delorean.is-true () {
-  # case insensitive: "1", "y", "yes", "t", "true", "o", and "on".
-  [[ -n "${1}" && "${1}" == (1|[Yy]([Ee][Ss]|)|[Tt]([Rr][Uu][Ee]|)|[Oo]([Nn]|)) ]]
-}
-
-@delorean.is-true-yes-no () {
-  @delorean.is-true "${1}" && builtin print 'yes' || builtin print 'no'
-}
-
-# TODO: Get rid of this.
-@delorean.is-flag () {
-  [[ "${1[1]}" == '-' ]]
-}
-
-@delorean.is-flag-yes-no () {
-  @delorean.is-flag "${1}" && builtin print 'yes' || builtin print 'no'
-}
-
 @delorean.log () {
-  @delorean.is-true "${DELOREAN[debug]}" && builtin print "${DELOREAN[prog]}[${1}]: ${2}"
+  (( ${DELOREAN[debug]} )) && builtin print "${DELOREAN[prog]}[${1}]: ${2}"
 }
 
 @delorean.log-info () {
@@ -50,7 +32,7 @@ fi
 }
 
 @delorean.import () {
-  @delorean.is-true "${DELOREAN[dev]}" || builtin return 0
+  (( ${DELOREAN[dev]} )) || builtin return 0
 
   builtin local -a 'parts' 'middle'
   builtin local 'front' 'back' 'trace' 'search' 'file'
@@ -83,7 +65,7 @@ fi
 }
 
 #
-# Main function for executing commands.
+# Main function.
 #
 
 88 () {
@@ -100,20 +82,20 @@ fi
   # Parse flags and set universal options.
   #
 
-  builtin zparseopts -D -- '-dev=isDev' '-debug=isDebug'
+  builtin zparseopts -A opts -D -E -M -- '-dev' '-debug'
 
-  DELOREAN[dev]="$(@delorean.is-flag-yes-no "${isDev}")"
-  DELOREAN[debug]="$(@delorean.is-flag-yes-no "${isDebug}")"
+  DELOREAN[dev]="${+opts[--dev]}"
+  DELOREAN[debug]="${+opts[--debug]}"
 
   #
-  # Main entry point depends on invokation method.
+  # Entry point depends on invokation method.
   #
 
   if [[ "${ZSH_EVAL_CONTEXT[1,8]}" == 'toplevel' ]]; then
     #
-    # Command invokation (from CLI):
-    #   - F.ex: ./88 --dev future -c
+    # User invokation:
     #   - Execute the passed command with flags.
+    #   - F.ex, from the command-line: ./88 --dev future -c
     #
 
     DELOREAN[prog]='88'
@@ -127,7 +109,7 @@ fi
 
     if @delorean.exec "${@[@]}"; then
       #
-      # Don't start any subprocesses if STDIN is not a TTY.
+      # Don't start any subprocess if STDIN is not a TTY.
       #
 
       if ! [[ -t 0 || -p /dev/stdin ]]; then
@@ -153,17 +135,17 @@ fi
       builtin exit 0
     else
       #
-      # The command failed; return the error code.
+      # The command failed: return the error code.
       #
 
       builtin return "${?}"
     fi
-  else
+  elif [[ "${ZSH_EVAL_CONTEXT[1,4]}" == 'file' ]]; then
     #
-    # Source invokation (from a file):
-    #   - F.ex: source "${ZDOTDIR}/88"
+    # Runcom invokation:
     #   - Do any necessary recompilation.
-    #   - Modify the sourcing Zsh instance.
+    #   - Affect the sourcing Zsh instance.
+    #   - F.ex, in .zshrc: source "${DELOREAN_LOCATION}/88"
     #
 
     DELOREAN[prog]='DeLorean'
@@ -173,6 +155,44 @@ fi
     @delorean.source
   fi
 }
+
+#
+# Get DeLorean up to speed!
+#
+
+88 "${@[@]}"
+builtin return "${?}"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #DELOREAN[loc]="${${funcsourcetrace[1]%:*}:A:h}"
 
@@ -209,12 +229,6 @@ fi
 #DELOREAN[lib]="${DELOREAN[dir]}/lib"
 # Import schematic templates as functions...
 
-#
-# Get DeLorean up to speed!
-#
-
-88 "${@[@]}"
-builtin return "${?}"
 
 # 88 is not necessarily in same directory as ZDOTDIR
 #
@@ -244,3 +258,7 @@ builtin return "${?}"
 #     - Headless option... --skip-login if ! [ -t 0 ] || [ -p /dev/stdin ]; then
 #   - zplugin
 #   - Lazy load triggers
+#   
+#   - Brew commands in circuits
+#   - Circuits can register mackup-style backups of configs.
+#   - Zdharma website = crowdfunding

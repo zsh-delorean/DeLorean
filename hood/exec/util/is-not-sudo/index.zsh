@@ -1,12 +1,11 @@
-#
-# Disallow sudo, in order to keep the space-time continuum intact.
-#
-
 @delorean.exec.util.is-not-sudo () {
+  #
+  # Disallow sudo, in order to keep the space-time continuum intact.
+  #
+
   if (( ${EUID} == 0 )); then
     @delorean.import './stderr/is-sudo'
-    @delorean.exec.util.is-not-sudo.stderr.is-sudo
+    ${0}.stderr.is-sudo
     builtin return 1
   fi
 }
-
