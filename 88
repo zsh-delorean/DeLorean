@@ -31,6 +31,10 @@ fi
   done
 }
 
+#
+# File importer used for dev.
+#
+
 @delorean.import () {
   (( ${DELOREAN[dev]} )) || builtin return 0
 
@@ -91,22 +95,30 @@ fi
   # Entry point depends on invokation method.
   #
 
-  if [[ "${ZSH_EVAL_CONTEXT[1,8]}" == 'toplevel' ]]; then
+  if [[ "${ZSH_EVAL_CONTEXT[1,4]}" == 'file' ]]; then
     #
-    # User invokation:
-    #   - Execute the passed command with flags.
+    # Invoked by runcom:
+    #   - Do any necessary recompilation.
+    #   - Affect the sourcing Zsh instance.
+    #   - F.ex, in .zshrc: source "${DELOREAN_LOCATION}/88"
+    #
+
+    DELOREAN[prog]='DeLorean'
+    @delorean.log-DELOREAN
+
+    @delorean.import '~/source/'
+    @delorean.source
+  elif [[ "${ZSH_EVAL_CONTEXT[1,8]}" == 'toplevel' ]]; then
+    #
+    # Invoked by user:
+    #   - Execute the passed command plus flags.
     #   - F.ex, from the command-line: ./88 --dev future -c
     #
 
     DELOREAN[prog]='88'
     @delorean.log-DELOREAN
 
-    #
-    # Execute the requested command and pass along any flags.
-    #
-
     @delorean.import '~/exec/'
-
     if @delorean.exec "${@[@]}"; then
       #
       # Don't start any subprocess if STDIN is not a TTY.
@@ -135,24 +147,11 @@ fi
       builtin exit 0
     else
       #
-      # The command failed: return the error code.
+      # The command failed... return the error code.
       #
 
       builtin return "${?}"
     fi
-  elif [[ "${ZSH_EVAL_CONTEXT[1,4]}" == 'file' ]]; then
-    #
-    # Runcom invokation:
-    #   - Do any necessary recompilation.
-    #   - Affect the sourcing Zsh instance.
-    #   - F.ex, in .zshrc: source "${DELOREAN_LOCATION}/88"
-    #
-
-    DELOREAN[prog]='DeLorean'
-    @delorean.log-DELOREAN
-
-    @delorean.import "~/source/"
-    @delorean.source
   fi
 }
 
