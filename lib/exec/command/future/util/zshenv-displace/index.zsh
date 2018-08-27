@@ -43,8 +43,8 @@
   #
 
   @delorean.exec.command.future.util.schematic "zshenv.${DELOREAN[zshenv_ext]}" "${DELOREAN[zshenv_loc]}" "${DELOREAN[zshenv_su]}"
-  if (( ${?} != 0 )); then
-    @delorean.exec.command.future.util.zshenv-displace.stderr.schematic-fail
+  if (( ${?} )); then
+    ${0}.stderr.schematic-fail
     builtin return 1
   fi
 

@@ -3,13 +3,13 @@
   @delorean.util.stderr-prefix
 
   builtin local 'in'
-  in="${1}"
+  cmd="${1}"
 
 <<EOF >&2
 
-${DELOREAN_TRUNK[T]}Schematic file is missing or lost in space and time:
+${DELOREAN_TRUNK[T]}Schematic function is missing or lost in space and time:
 ${DELOREAN_TRUNK[I]}
-${DELOREAN_TRUNK[L]}${in}
+${DELOREAN_TRUNK[L]}${cmd}
 
 EOF
 }

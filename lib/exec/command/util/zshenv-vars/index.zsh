@@ -1,13 +1,13 @@
-#
-# Zshenv variables.
-#
-
 @delorean.exec.command.util.zshenv-vars () {
-  local 'isSystem'
+  builtin local 'system' 'zshenv_epoch'
 
-  isSystem="${1}"
+  system="${1}"
 
-  if @delorean.is-flag "${isSystem}"; then
+  #
+  # Zshenv variables.
+  #
+
+  if (( ${system} )); then
     DELOREAN[zshenv_su]='yes'
     DELOREAN[zshenv_ext]='system'
     DELOREAN[zshenv_loc]="/etc/zshenv"
@@ -22,11 +22,10 @@
   #
 
   builtin zmodload 'zsh/attr'
-  builtin local 'zshenv_epoch'
-  builtin zgetattr "${DELOREAN[zshenv_loc]}" 'epoch' 'zshenv_epoch' &>/dev/null
-  DELOREAN[zshenv_epoch]="${zshenv_epoch}"
-
   builtin zmodload -F 'zsh/stat' 'b:zstat'
-  DELOREAN[zshenv_mtime]="$(builtin zstat '+mtime' "${DELOREAN[zshenv_loc]}" 2>/dev/null)"
 
+  builtin zgetattr "${DELOREAN[zshenv_loc]}" 'epoch' 'zshenv_epoch' &>/dev/null
+
+  DELOREAN[zshenv_epoch]="${zshenv_epoch}"
+  DELOREAN[zshenv_mtime]="$(builtin zstat '+mtime' "${DELOREAN[zshenv_loc]}" 2>/dev/null)"
 }

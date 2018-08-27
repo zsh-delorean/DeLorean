@@ -199,13 +199,13 @@ fi
 #   -zdotdir::zdotdir
 #   --zdotdir '~/ZDOTDIR'
 # elif (( ${+DELOREAN_ZSHENV} ))
-DELOREAN[zdotdir]="${ZDOTDIR}"
+#DELOREAN[zdotdir]="${ZDOTDIR}"
 # else
-DELOREAN[zdotdir]="${HOME}/.config/ZDOTDIR"
+#DELOREAN[zdotdir]="${HOME}/.config/ZDOTDIR"
 
 # Move these into import method
-DELOREAN[dir]="${${funcsourcetrace[1]%:*}:A:h}"
-DELOREAN[lib]="${DELOREAN[dir]}/lib"
+#DELOREAN[dir]="${${funcsourcetrace[1]%:*}:A:h}"
+#DELOREAN[lib]="${DELOREAN[dir]}/lib"
 # Import schematic templates as functions...
 
 #
