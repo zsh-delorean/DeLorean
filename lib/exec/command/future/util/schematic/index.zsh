@@ -23,7 +23,7 @@
   # Read in and replace any __ZDOTDIR__ strings with absolute location.
   #
 
-  schema="${$(<"${in}")//__ZDOTDIR__/${DELOREAN[dir]}/ZDOTDIR}"
+  schema="${${$(<"${in}")//__ZDOTDIR__/${DELOREAN[loc]}/ZDOTDIR}//__LOCATION__/${DELOREAN[loc]}}"
 
   #
   # Write out.

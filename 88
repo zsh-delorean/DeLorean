@@ -68,7 +68,7 @@ fi
       front="${trace}/.."
     ;;
     ('~'|'@delorean')
-      front="${DELOREAN[lib]}"
+      front="${DELOREAN[loc]}/lib"
     ;;
   esac
 
@@ -87,7 +87,16 @@ fi
 
 88 () {
   #
-  # Parse universal options.
+  # Shared global associative arrays (hidden).
+  #
+
+  builtin typeset -gAH 'DELOREAN' 'DELOREAN_TRUNK'
+
+  DELOREAN[loc]="${0:A:h}"
+  DELOREAN[min_zsh_version]='5.0'
+
+  #
+  # Parse flags and set universal options.
   #
 
   builtin zparseopts -D -- '-dev=isDev' '-debug=isDebug'
@@ -99,9 +108,9 @@ fi
   # Main entry point depends on invokation method.
   #
 
-  if [[ "${ZSH_EVAL_CONTEXT}" == 'toplevel' ]]; then
+  if [[ "${ZSH_EVAL_CONTEXT[1,8]}" == 'toplevel' ]]; then
     #
-    # Command invokation:
+    # Command invokation (from CLI):
     #   - F.ex: ./88 --dev future -c
     #   - Execute the passed command with flags.
     #
@@ -150,7 +159,7 @@ fi
     fi
   else
     #
-    # Source invokation:
+    # Source invokation (from a file):
     #   - F.ex: source "${ZDOTDIR}/88"
     #   - Do any necessary recompilation.
     #   - Modify the sourcing Zsh instance.
@@ -164,13 +173,7 @@ fi
   fi
 }
 
-#
-# Shared global associative arrays (hidden).
-#
-
-builtin typeset -gAH 'DELOREAN' 'DELOREAN_TRUNK'
-
-DELOREAN[min_zsh_version]='5.0'
+#DELOREAN[loc]="${${funcsourcetrace[1]%:*}:A:h}"
 
 # Installer will clone zsh-delorean/delorean to:
 #   ~/.delorean

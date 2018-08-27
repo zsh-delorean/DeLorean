@@ -22,37 +22,41 @@
 #   - [ ] /etc/zlogout
 #
 
-# Start the DeLorean engine.
-if [[ -s "${ZDOTDIR}/engine.zsh" ]]; then
-  source "${ZDOTDIR}/engine.zsh"
+# Get the DeLorean up to speed.
+if [[ -s "${DELOREAN_LOCATION}/88" ]]; then
+  source "${DELOREAN_LOCATION}/88"
 fi
 
 ################################################################################
-# Increase limits.
+# Limits.
 ################################################################################
+
+#
+# Maximum number of open file descriptors any one process may have.
+#
 
 ulimit -n 2560
 
 ################################################################################
-# User hooks.
+# Hooks.
 ################################################################################
 
 #
-# For the `cdr` command.
+# Hook 'chpwd_recent_dirs' to 'chpwd' for the `cdr` command.
 #
 
 # add-zsh-hook chpwd chpwd_recent_dirs
 
 ################################################################################
-# User functions.
+# Functions.
 ################################################################################
 
 #
-# Define user functions here.
+# Define interactive user functions here.
 #
 
 ###############################################################################
-# Program aliases.
+# Aliases.
 ###############################################################################
 
 alias v='vim'

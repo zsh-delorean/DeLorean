@@ -21,7 +21,7 @@
 #
 
 ################################################################################
-# Interactive options.
+# Interactive settings.
 ################################################################################
 
 #
@@ -69,7 +69,7 @@ if (( ${#commands[(i)lesspipe(|.sh)]} )); then
 fi
 
 ################################################################################
-# User variables.
+# Variables.
 ################################################################################
 
 #
@@ -92,7 +92,7 @@ fi
 # Ensure path arrays do not contain duplicates.
 #
 
-typeset -gU cdpath fpath mailpath path
+typeset -gU 'cdpath' 'fpath' 'mailpath' 'path'
 
 #
 # Set the the list of directories that cd searches.

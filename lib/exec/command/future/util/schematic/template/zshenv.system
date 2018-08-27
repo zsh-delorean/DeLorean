@@ -1,5 +1,5 @@
 #
-# Sets $ZDOTDIR to the DeLorean location. 
+# Sets $ZDOTDIR and the DeLorean location. 
 #
 
 ################################################################################
@@ -14,6 +14,22 @@
 # found in $ZDOTDIR, so the DeLorean .zshenv is sourced automatically.
 ################################################################################
 
-export DELOREAN_ZSHENV='/etc/zshenv'
+builtin export DELOREAN_ZSHENV='/etc/zshenv'
+builtin export DELOREAN_LOCATION='__LOCATION__'
 
-export ZDOTDIR='__ZDOTDIR__'
+if ! [[ -s "${DELOREAN_LOCATION}/88" ]]; then
+<<EOF >&2
+
+  Aborting ZDOTDIR redirection for:
+    ${DELOREAN_ZSHENV}
+
+  Failed to find DeLorean location:
+    ${DELOREAN_LOCATION}
+
+  Please try reinstalling DeLorean!
+
+EOF
+  builtin return
+fi
+
+builtin export ZDOTDIR='__ZDOTDIR__'
