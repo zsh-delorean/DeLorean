@@ -26,6 +26,7 @@ fi
   @delorean.is-true "${1}" && builtin print 'yes' || builtin print 'no'
 }
 
+# TODO: Get rid of this.
 @delorean.is-flag () {
   [[ "${1[1]}" == '-' ]]
 }

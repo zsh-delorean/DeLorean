@@ -12,7 +12,7 @@
     if (( ${DELOREAN[zshenv_epoch]} )); then
       # but has been tampered with
       if (( ${DELOREAN[zshenv_epoch]} != ${DELOREAN[zshenv_mtime]} )); then
-        @delorean.exec.command.future.util.zshenv-displace.stderr.has-been-modified
+        ${0}.stderr.has-been-modified
         builtin return 1
       fi
     # or, it was not created by us
@@ -20,12 +20,12 @@
       if ! [[ -s "${DELOREAN[zshenv_loc]}.past" ]]; then
         ${DELOREAN[zshenv_su]:+'sudo'} builtin noglob command mv -v "${DELOREAN[zshenv_loc]}" "${DELOREAN[zshenv_loc]}.past"
       else
-        @delorean.exec.command.future.util.zshenv-displace.stderr.backup-past-conflict
+        ${0}.stderr.backup-past-conflict
         builtin return 1
       fi
     # or, the user chose to abort
     else
-      @delorean.exec.command.future.util.zshenv-displace.stderr.backup-abort
+      ${0}.stderr.backup-abort
       builtin return 1
     fi
   fi
@@ -43,6 +43,7 @@
   #
 
   @delorean.exec.command.future.util.schematic "zshenv.${DELOREAN[zshenv_ext]}" "${DELOREAN[zshenv_loc]}" "${DELOREAN[zshenv_su]}"
+
   if (( ${?} )); then
     ${0}.stderr.schematic-fail
     builtin return 1
