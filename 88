@@ -69,7 +69,7 @@ fi
       front="${trace}/.."
     ;;
     ('~'|'@delorean')
-      front="${DELOREAN[loc]}/lib"
+      front="${DELOREAN[loc]}/hood"
     ;;
   esac
 
