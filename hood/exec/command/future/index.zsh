@@ -45,8 +45,7 @@
   # Temporally displace zshenv (backs up to f.ex: ~/zshenv.past).
   #
 
-  ${0}.util.zshenv-displace
-  (( ${?} == 0 )) || builtin return 1
+  ${0}.util.zshenv-displace || builtin return 1
 
   #
   # Materialize any missing user files into ZDOTDIR (non-zero exit is OK).
@@ -57,7 +56,9 @@
   user_files=('.zshenv' '.zprofile' '.zshrc' 'flux-capacitor.zsh' '.zlogin' '.zlogout')
 
   for file in "${user_files[@]}"; do
-    ${0}.util.schematic "${file}" "${DELOREAN[zdotdir]}/${file}" 2>/dev/null
+    {
+      ${0}.util.schematic "${file}" "${DELOREAN[zdotdir]}/${file}"
+    } 2>/dev/${${${DELOREAN[debug]/0}:+stderr}:-null}
   done
 
   #

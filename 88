@@ -79,8 +79,8 @@ fi
 
   builtin typeset -gAH 'DELOREAN' 'DELOREAN_TRUNK'
 
-  DELOREAN[loc]="${0:A:h}"
   DELOREAN[min_zsh_version]='5.0'
+  DELOREAN[loc]="${${funcsourcetrace[1]%:*}:A:h}"
 
   #
   # Parse flags and set universal options.
@@ -261,3 +261,5 @@ builtin return "${?}"
 #   - Brew commands in circuits
 #   - Circuits can register mackup-style backups of configs.
 #   - Zdharma website = crowdfunding
+#
+#   - Will need to be DELOREAN_CIRCUITS.

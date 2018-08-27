@@ -211,7 +211,7 @@ function circuit {
           # Remember for second call (on close).
           DELOREAN_CIRCUITS+="${circuit}"
           # Add the circuit itself to the digest.
-          digest "${ZDOTDIR}/circuits/${circuit}/circuit-${circuit}" 
+          digest "${DELOREAN_LOCATION}/ZDOTDIR/circuits/${circuit}/circuit-${circuit}" 
           # Don't try to initiate a second time.
           zstyle ":delorean:circuit:${circuit}" 'initiated' 'yes'
         ;;
@@ -329,8 +329,8 @@ function circuit-close {
 # Flux capacitor configuration.
 #
 
-if [[ -s "${ZDOTDIR}/flux-capacitor.zsh" ]]; then
-  source "${ZDOTDIR}/flux-capacitor.zsh"
+if [[ -s "${DELOREAN_LOCATION}/ZDOTDIR/flux-capacitor.zsh" ]]; then
+  source "${DELOREAN_LOCATION}/ZDOTDIR/flux-capacitor.zsh"
 fi
 
 #

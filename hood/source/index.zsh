@@ -44,7 +44,7 @@ EOF
       # Checks if the file has the "epoch" attribute.
       #
 
-      'exists')
+      ('exists')
         zgetattr "$1" 'epoch' 'epoch_exists' &>/dev/null && return 0 || return 1
       ;;
 
@@ -52,7 +52,7 @@ EOF
       # Compares the "epoch" attribute of two files.
       #
 
-      'uptodate')
+      ('uptodate')
         zgetattr "$1" 'epoch' 'passed_epoch' &>/dev/null || return 1
         return $(( DELOREAN_EPOCH != passed_epoch ))
       ;;
@@ -61,7 +61,7 @@ EOF
       # Updates the "epoch" attribute of a file.
       #
 
-      'update')
+      ('update')
         zsetattr "$1" 'epoch' "${DELOREAN_EPOCH}"
       ;;
     esac
@@ -197,12 +197,12 @@ EOF
     for circuit in "$@"; do
       if zstyle -t ":delorean:circuit:${circuit}" 'initiated' 'yes' 'no'; then
         continue
-      elif [[ ! -d "${ZDOTDIR}/circuits/${circuit}" ]]; then
+      elif [[ ! -d "${DELOREAN_LOCATION}/ZDOTDIR/circuits/${circuit}" ]]; then
         print "DeLorean: no such circuit: ${circuit}" >&2
         zstyle ":delorean:circuit:${circuit}" initiated 'no'
         continue
       else
-        (( ${+DELOREAN_UPTODATE} )) || fpath=("${ZDOTDIR}/circuits/${circuit}" $fpath)
+        (( ${+DELOREAN_UPTODATE} )) || fpath=("${DELOREAN_LOCATION}/ZDOTDIR/circuits/${circuit}" $fpath)
 
         # First call for each circuit in sequence.
         autoload -Uz +X "circuit-${circuit}" && "circuit-${circuit}"
@@ -212,7 +212,7 @@ EOF
             # Remember for second call (on close).
             DELOREAN_CIRCUITS+="${circuit}"
             # Add the circuit itself to the digest.
-            digest "${ZDOTDIR}/circuits/${circuit}/circuit-${circuit}" 
+            digest "${DELOREAN_LOCATION}/ZDOTDIR/circuits/${circuit}/circuit-${circuit}" 
             # Don't try to initiate a second time.
             zstyle ":delorean:circuit:${circuit}" 'initiated' 'yes'
           ;;
@@ -239,20 +239,20 @@ EOF
   }
 
   #
-  # Allows sequencing of circuits after the fact. This has many side-effects, so
-  # a circuit loaded this may need to be specially designed for this use-case.
+  # Allows sequencing of circuits after the fact. This has many side-effects,
+  # so a circuit loaded this way may need special design for this use-case.
   #
-  # However, using interrupt for lazy-loading does seem to work with many of the
-  # default circuits after some preliminary tests, which might be useful if a
-  # circuit is needed for a one-off task in a specific session.
+  # However, using interrupt for lazy-loading does seem to work with many of
+  # the default circuits after some preliminary tests, which might be useful if
+  # a circuit is needed for a one-off task in a specific session.
   #
   # Obvious side-effects:
   #
   # ALL functions and completions from the circuit digest will be available on
   # the fpath. Does NOT respect load order, and will be as if it loaded last.
   #
-  # Initiation sequence will NOT be respected; will be as if it had ran after all
-  # other modules initialized and executed; because many may already have.
+  # Initiation sequence will NOT be respected; will be as if it had ran after
+  # all other modules initialized and executed; because many may already have.
   #
   # Will NOT be compiled in any way; compinit will be called with the -D flag.
   #
@@ -330,8 +330,8 @@ EOF
   # Flux capacitor configuration.
   #
 
-  if [[ -s "${ZDOTDIR}/flux-capacitor.zsh" ]]; then
-    source "${ZDOTDIR}/flux-capacitor.zsh"
+  if [[ -s "${DELOREAN_LOCATION}/ZDOTDIR/flux-capacitor.zsh" ]]; then
+    source "${DELOREAN_LOCATION}/ZDOTDIR/flux-capacitor.zsh"
   fi
 
   #

@@ -1,4 +1,4 @@
-@delorean.exec.command.future.util.schematic.stdout--zshenv.system () {
+@delorean.exec.command.future.util.schematic.stdout--flux-capacitor.zsh () {
 <<'FILE'
 #
 # Tweaking the flux capacitor makes DeLorean travel to an alternate future!
