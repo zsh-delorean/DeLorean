@@ -232,23 +232,22 @@ builtin return "${?}"
 # 88 is not necessarily in same directory as ZDOTDIR
 #
 # .zshenv =__ZDOTDIR__=> ~/.config/ZDOTDIR
-# ~/.config/ZDOTDIR/.zshrc =source=> /usr/local/bin/88 -> ~/.delorean/88
+# ~/.config/ZDOTDIR/.zshrc =source=> DELOREAN_LOCATION/88 -> ~/.delorean/88
 # ~/.delorean/88 =source=> ~/.config/ZDOTDIR/flux-capacitor.zsh
 # ~/.delorean/88 =circuit=> ~/.config/ZDOTDIR/circuits/environment/circuit-environment
-#
-# -z ... Specify location of ZDOTDIR (~/.config/ZDOTDIR by default)
-# DELOREAN[zdotdir]='~/.config/ZDOTDIR'
 
 # If running 88, user wants:
-#   - Restore old zshenv.
-#   - Copy schematics and change shell.
-#   - Mark next login shell to rebuild after .z* or $fpath change.
+#   - past: Restore old zshenv.
+#   - future -c: Copy schematics and change shell.
+#   - future: Mark next login shell to rebuild because of .z* or $fpath change.
+#
 #   - Manage the centralized repository of user functions and aliases?
 #   - Enable or disable circuits or reorder?
-# If user is sourcing 88, shell wants:
-#   - Flatten fpath if 88 was ran.
+#
+# If user is sourcing 88, DeLorean should:
+#   - Flatten fpath if 88 future ran and marked zshenv epoch.
 #   - Replace fpath with flattened location.
-#   - Load circuits in order.
+#   - Load circuits.
 
 # TODO/CONSIDER:
 #   - Location after install (compare to zulu)
@@ -260,6 +259,5 @@ builtin return "${?}"
 #   
 #   - Brew commands in circuits
 #   - Circuits can register mackup-style backups of configs.
-#   - Zdharma website = crowdfunding
 #
 #   - Will need to be DELOREAN_CIRCUITS.

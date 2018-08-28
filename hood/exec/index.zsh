@@ -34,6 +34,7 @@
     #
 
     ('future')
+      @delorean.log-info "${0} () => future ${@[@]}"
       ${0}.command.future "${@[@]}"
     ;;
 
@@ -42,6 +43,7 @@
     #
 
     ('past')
+      @delorean.log-info "${0} () => past ${@[@]}"
       ${0}.command.past "${@[@]}"
     ;;
 

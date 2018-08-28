@@ -23,7 +23,7 @@
   fi
 
   #
-  # Read in and replace multiple with absolute location.
+  # Read in, and replace multiple with absolute locations.
   #
 
   schema="$("${cmd}")"
@@ -31,13 +31,13 @@
   schema="${${schema}//__ZDOTDIR__/${DELOREAN[zdotdir]}}"
 
   #
-  # Write out.
+  # Write out, ignoring escape conventions of echo.
   #
 
-  builtin print "${schema}" | ${su:+'sudo'} builtin command tee "${out}" >/dev/null
+  builtin print -r "${schema}" | ${su:+'sudo'} builtin command tee "${out}" >/dev/null
 
   #
-  # Get mtime.
+  # Get mtime status.
   #
 
   mtime="$(builtin zmodload -F 'zsh/stat' 'b:zstat'; builtin zstat '+mtime' "${out}")"

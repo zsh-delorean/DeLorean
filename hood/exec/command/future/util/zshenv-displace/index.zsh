@@ -16,7 +16,7 @@
         builtin return 1
       fi
     # or, it was not created by us
-    elif read -q "?Backup ${DELOREAN[zshenv_loc]} and proceed [y/N]? " && print; then
+    elif read -q "?Backup ${DELOREAN[zshenv_loc]} and proceed [y/N]? " && builtin print; then
       if ! [[ -s "${DELOREAN[zshenv_loc]}.past" ]]; then
         ${DELOREAN[zshenv_su]:+'sudo'} builtin noglob command mv -v "${DELOREAN[zshenv_loc]}" "${DELOREAN[zshenv_loc]}.past"
       else

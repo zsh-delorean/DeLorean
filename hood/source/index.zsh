@@ -32,10 +32,10 @@ EOF
 
     zmodload 'zsh/attr'
 
-    # Cache the value of DELOREAN_EPOCH.
-    if (( ! ${+DELOREAN_EPOCH} )); then
-      export 'DELOREAN_EPOCH'
-      zgetattr "${DELOREAN_ZSHENV}" 'epoch' 'DELOREAN_EPOCH'
+    # Cache the value of _DELOREAN_EPOCH.
+    if (( ! ${+_DELOREAN_EPOCH} )); then
+      export '_DELOREAN_EPOCH'
+      zgetattr "${DELOREAN_ZSHENV}" 'epoch' '_DELOREAN_EPOCH'
     fi
 
     case "${0/epoch-/}" in
@@ -54,7 +54,7 @@ EOF
 
       ('uptodate')
         zgetattr "$1" 'epoch' 'passed_epoch' &>/dev/null || return 1
-        return $(( DELOREAN_EPOCH != passed_epoch ))
+        return $(( _DELOREAN_EPOCH != passed_epoch ))
       ;;
 
       #
@@ -62,7 +62,7 @@ EOF
       #
 
       ('update')
-        zsetattr "$1" 'epoch' "${DELOREAN_EPOCH}"
+        zsetattr "$1" 'epoch' "${_DELOREAN_EPOCH}"
       ;;
     esac
   }
@@ -84,30 +84,30 @@ EOF
     zstyle -a ':delorean:fpath' 'blacklist' 'blacklist'
     blacklist="^(${(j:|:)blacklist})"
 
-    if [[ -d "${DELOREAN_FPATH}" ]]; then
-      epoch-exists "${DELOREAN_FPATH}" && rm -r "${DELOREAN_FPATH}" || {
-        print "DeLorean: Failed to remove the fpath directory ${DELOREAN_FPATH}" >&2
+    if [[ -d "${_DELOREAN_FPATH}" ]]; then
+      epoch-exists "${_DELOREAN_FPATH}" && rm -r "${_DELOREAN_FPATH}" || {
+        print "DeLorean: Failed to remove the fpath directory ${_DELOREAN_FPATH}" >&2
         return 1
       }
     fi
 
-    mkdir -p "${DELOREAN_FPATH}" || {
-      print "DeLorean: Failed to create the fpath directory ${DELOREAN_FPATH}" >&2
+    mkdir -p "${_DELOREAN_FPATH}" || {
+      print "DeLorean: Failed to create the fpath directory ${_DELOREAN_FPATH}" >&2
       return 1
     }
 
     # Anon func to contain setopt and redirect "no match found" errors.
     function {
       setopt 'local_options' 'extended_glob'
-      for fp ("${fpath[@]}") cp -n "${fp}/"${~blacklist} "${DELOREAN_FPATH}"
+      for fp ("${fpath[@]}") cp -n "${fp}/"${~blacklist} "${_DELOREAN_FPATH}"
     } &>/dev/null
 
-    [[ -s "${DELOREAN_FPATH}/compinit" && -s "${DELOREAN_FPATH}/_complete" ]] || {
-      print "DeLorean: Important files missing from ${DELOREAN_FPATH}" >&2
+    [[ -s "${_DELOREAN_FPATH}/compinit" && -s "${_DELOREAN_FPATH}/_complete" ]] || {
+      print "DeLorean: Important files missing from ${_DELOREAN_FPATH}" >&2
       return 1
     }
 
-    epoch-update "${DELOREAN_FPATH}"
+    epoch-update "${_DELOREAN_FPATH}"
   }
 
   #
@@ -120,7 +120,7 @@ EOF
 
     setopt 'local_options' 'extended_glob'
 
-    for it in "${DELOREAN_FPATH}/"*; do
+    for it in "${_DELOREAN_FPATH}/"*; do
       [[ "${${it:t}[1]}" == '_' ]] && continue
       ztail=("${zarr[@]:t}")
       if [[ -z "${ztail[(r)${it:t}]}" ]]; then
@@ -134,10 +134,10 @@ EOF
       fi
     done
 
-    zcompile -Uz "${DELOREAN_DIGEST}" "${zarr[@]}"
+    zcompile -Uz "${_DELOREAN_DIGEST}" "${zarr[@]}"
 
-    zcompile -t "${DELOREAN_DIGEST}" 'compinit' 'promptinit' || {
-      print "DeLorean: Important functions missing from ${DELOREAN_DIGEST}" >&2
+    zcompile -t "${_DELOREAN_DIGEST}" 'compinit' 'promptinit' || {
+      print "DeLorean: Important functions missing from ${_DELOREAN_DIGEST}" >&2
       return 1
     }
   }
@@ -151,23 +151,23 @@ EOF
   #
 
   function circuit-open {
-    typeset -ga 'DELOREAN_CIRCUITS'
-    typeset -ga 'DELOREAN_FUNCTIONS'
-    typeset -ga 'DELOREAN_COMPLETIONS'
+    typeset -ga '_DELOREAN_CIRCUITS'
+    typeset -ga '_DELOREAN_FUNCTIONS'
+    typeset -ga '_DELOREAN_COMPLETIONS'
 
-    DELOREAN_FPATH="${TMPPREFIX}-${ZSH_VERSION}-fpath"
-    DELOREAN_DIGEST="${TMPPREFIX}-${ZSH_VERSION}-fpath.zwc"
-    DELOREAN_COMPDUMP="${TMPPREFIX}-${ZSH_VERSION}-zcompdump"
+    _DELOREAN_FPATH="${TMPPREFIX}-${ZSH_VERSION}-fpath"
+    _DELOREAN_DIGEST="${TMPPREFIX}-${ZSH_VERSION}-fpath.zwc"
+    _DELOREAN_COMPDUMP="${TMPPREFIX}-${ZSH_VERSION}-zcompdump"
 
-    epoch-uptodate "${DELOREAN_FPATH}" && DELOREAN_UPTODATE='yes'
+    epoch-uptodate "${_DELOREAN_FPATH}" && _DELOREAN_UPTODATE='yes'
 
-    if (( ${+DELOREAN_UPTODATE} )) || fpath-flatten; then
+    if (( ${+_DELOREAN_UPTODATE} )) || fpath-flatten; then
       DELOREAN_FLAT='yes'
-      fpath=("${DELOREAN_FPATH}")
+      fpath=("${_DELOREAN_FPATH}")
     fi
 
-    if (( ${+DELOREAN_UPTODATE} )); then
-      fpath=("${DELOREAN_DIGEST}" $fpath)
+    if (( ${+_DELOREAN_UPTODATE} )); then
+      fpath=("${_DELOREAN_DIGEST}" $fpath)
     fi
   }
 
@@ -180,9 +180,9 @@ EOF
 
     for it in "$@"; do
       if [[ "${${it:t}[1]}" == '_' ]]; then
-        DELOREAN_COMPLETIONS=("${it}" $DELOREAN_COMPLETIONS)
+        _DELOREAN_COMPLETIONS=("${it}" $_DELOREAN_COMPLETIONS)
       else
-        DELOREAN_FUNCTIONS=("${it}" $DELOREAN_FUNCTIONS)
+        _DELOREAN_FUNCTIONS=("${it}" $_DELOREAN_FUNCTIONS)
       fi
     done
   }
@@ -197,12 +197,12 @@ EOF
     for circuit in "$@"; do
       if zstyle -t ":delorean:circuit:${circuit}" 'initiated' 'yes' 'no'; then
         continue
-      elif [[ ! -d "${DELOREAN_LOCATION}/ZDOTDIR/circuits/${circuit}" ]]; then
+      elif [[ ! -d "${DELOREAN_CIRCUITS}/${circuit}" ]]; then
         print "DeLorean: no such circuit: ${circuit}" >&2
         zstyle ":delorean:circuit:${circuit}" initiated 'no'
         continue
       else
-        (( ${+DELOREAN_UPTODATE} )) || fpath=("${DELOREAN_LOCATION}/ZDOTDIR/circuits/${circuit}" $fpath)
+        (( ${+_DELOREAN_UPTODATE} )) || fpath=("${DELOREAN_CIRCUITS}/${circuit}" $fpath)
 
         # First call for each circuit in sequence.
         autoload -Uz +X "circuit-${circuit}" && "circuit-${circuit}"
@@ -210,9 +210,9 @@ EOF
         case "$?" in
           ('0')
             # Remember for second call (on close).
-            DELOREAN_CIRCUITS+="${circuit}"
+            _DELOREAN_CIRCUITS+="${circuit}"
             # Add the circuit itself to the digest.
-            digest "${DELOREAN_LOCATION}/ZDOTDIR/circuits/${circuit}/circuit-${circuit}" 
+            digest "${DELOREAN_CIRCUITS}/${circuit}/circuit-${circuit}" 
             # Don't try to initiate a second time.
             zstyle ":delorean:circuit:${circuit}" 'initiated' 'yes'
           ;;
@@ -261,10 +261,10 @@ EOF
     if [[ "${ZSH_EVAL_CONTEXT}" != 'toplevel:shfunc' ]]; then
       print 'DeLorean: The "interrupt" command should only be used from the command-line!' >&2
     fi
-    unset 'DELOREAN_UPTODATE' 'DELOREAN_FLAT'
-    DELOREAN_CIRCUITS=()
-    DELOREAN_FUNCTIONS=()
-    DELOREAN_COMPLETIONS=()
+    unset '_DELOREAN_UPTODATE' 'DELOREAN_FLAT'
+    _DELOREAN_CIRCUITS=()
+    _DELOREAN_FUNCTIONS=()
+    _DELOREAN_COMPLETIONS=()
     circuit "$@"
     circuit-close
   }
@@ -280,16 +280,16 @@ EOF
     autoload -Uz 'compinit'
 
     # Compile everything.
-    if (( ${+DELOREAN_UPTODATE} )); then
-      compinit -C -d "${DELOREAN_COMPDUMP}"
+    if (( ${+_DELOREAN_UPTODATE} )); then
+      compinit -C -d "${_DELOREAN_COMPDUMP}"
     else
       local 'fallback' 'circuit'
 
       if (( ${+DELOREAN_FLAT} )); then
-        if cp -f "${DELOREAN_FUNCTIONS[@]}" "${DELOREAN_COMPLETIONS[@]}" "${DELOREAN_FPATH}"; then
+        if cp -f "${_DELOREAN_FUNCTIONS[@]}" "${_DELOREAN_COMPLETIONS[@]}" "${_DELOREAN_FPATH}"; then
           if fpath-digest; then
-            if compinit -i -d "${DELOREAN_COMPDUMP}"; then
-              if ! zcompile -Uz "${DELOREAN_COMPDUMP}"; then
+            if compinit -i -d "${_DELOREAN_COMPDUMP}"; then
+              if ! zcompile -Uz "${_DELOREAN_COMPDUMP}"; then
                 print "DeLorean: Failed to compile the completion dump." >&2
               fi
             else
@@ -308,16 +308,16 @@ EOF
 
       if [[ "${fallback}" == 'yes' ]]; then
         # Last-ditch effort to have a working configuration.
-        fpath=(${"${DELOREAN_FUNCTIONS[@]}":h} ${"${DELOREAN_COMPLETIONS[@]}":h} $fpath)
+        fpath=(${"${_DELOREAN_FUNCTIONS[@]}":h} ${"${_DELOREAN_COMPLETIONS[@]}":h} $fpath)
         compinit -i -D
       fi
     fi
     
     # Mark all digest functions added by circuits for autoload-ing.
-    autoload -Uz ${"${DELOREAN_FUNCTIONS[@]}":t}
+    autoload -Uz ${"${_DELOREAN_FUNCTIONS[@]}":t}
 
     # Second call for each circuit in sequence.
-    for circuit in "${DELOREAN_CIRCUITS[@]}"; do
+    for circuit in "${_DELOREAN_CIRCUITS[@]}"; do
       "circuit-${circuit}" || print "DeLorean: Great Scott! The ${circuit} circuit blew a fuse." >&2
     done
   }
@@ -330,8 +330,8 @@ EOF
   # Flux capacitor configuration.
   #
 
-  if [[ -s "${DELOREAN_LOCATION}/ZDOTDIR/flux-capacitor.zsh" ]]; then
-    source "${DELOREAN_LOCATION}/ZDOTDIR/flux-capacitor.zsh"
+  if [[ -s "${ZDOTDIR}/flux-capacitor.zsh" ]]; then
+    source "${ZDOTDIR}/flux-capacitor.zsh"
   fi
 
   #

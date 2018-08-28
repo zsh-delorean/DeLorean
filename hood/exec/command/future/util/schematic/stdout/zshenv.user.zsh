@@ -19,6 +19,7 @@
 
 builtin export DELOREAN_ZSHENV="${HOME}/.zshenv"
 builtin export DELOREAN_LOCATION='__LOCATION__'
+builtin export DELOREAN_CIRCUITS="${DELOREAN_LOCATION}/ZDOTDIR/circuits"
 
 if ! [[ -s "${DELOREAN_LOCATION}/88" ]]; then
 <<EOF >&2

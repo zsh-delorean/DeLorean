@@ -39,7 +39,7 @@
   # Set zshenv variables.
   #
 
-  @delorean.exec.command.util.zshenv-vars "${+opts[--system]}"
+  @delorean.exec.command.util.zshenv-vars "${+opts[--system]}" || builtin return 1
 
   #
   # Temporally displace zshenv (backs up to f.ex: ~/zshenv.past).
