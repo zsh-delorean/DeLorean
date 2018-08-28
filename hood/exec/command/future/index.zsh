@@ -23,16 +23,18 @@
 
   if (( ${+opts[--zdotdir]} )); then
     DELOREAN[zdotdir]="${opts[--zdotdir]}"
-  elif (( ${+DELOREAN_ZSHENV} )); then
+  elif (( ${+DELOREAN_ZSHENV} )) && (( ${+ZDOTDIR} )); then
     DELOREAN[zdotdir]="${ZDOTDIR}"
   else
     DELOREAN[zdotdir]="${HOME}/.config/ZDOTDIR"
   fi
 
+  @delorean.log-info "${0} () => DELOREAN[zdotdir] = ${DELOREAN[zdotdir]}"
+
   builtin command mkdir -p "${DELOREAN[zdotdir]}"
 
   if ! [[ -d "${DELOREAN[zdotdir]}" ]]; then
-    ${0}.stderr.zdotdir-mkdir
+    ${0}.stderr.mkdir-zdotdir
     builtin return 1
   fi
 
@@ -42,16 +44,18 @@
 
   if (( ${+opts[--circuits]} )); then
     DELOREAN[circuits_loc]="${opts[--circuits]}"
-  elif (( ${+DELOREAN_ZSHENV} )); then
+  elif (( ${+DELOREAN_ZSHENV} )) && (( ${+DELOREAN_CIRCUITS} )); then
     DELOREAN[circuits_loc]="${DELOREAN_CIRCUITS}"
   else
     DELOREAN[circuits_loc]="${HOME}/.delorean/circuits"
   fi
 
+  @delorean.log-info "${0} () => DELOREAN[circuits_loc] = ${DELOREAN[circuits_loc]}"
+
   builtin command mkdir -p "${DELOREAN[circuits_loc]}"
 
   if ! [[ -d "${DELOREAN[circuits_loc]}" ]]; then
-    ${0}.stderr.circuits-mkdir
+    ${0}.stderr.mkdir-circuits
     builtin return 1
   fi
 
