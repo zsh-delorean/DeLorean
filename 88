@@ -171,63 +171,19 @@ builtin return "${?}"
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#DELOREAN[loc]="${${funcsourcetrace[1]%:*}:A:h}"
-
-# Installer will clone zsh-delorean/delorean to:
-#   ~/.delorean
-#
-#   ~/.delorean/delorean/{build.zsh,hood,.github,.git,.gitignore}
+# Installer will clone zsh-delorean/DeLorean to:
+#   ~/.delorean/DeLorean/{build.zsh,hood,.github,.git,.gitignore}
 #   ~/.delorean/circuits/{.git,.gitmodules,circuit-git,circuit-editor}
-#
 #   ~/.zplugin/
 
-# Build hood/88.zsh -> 88
-#   How will pass along --dev ?
-#   DELOREAN[dir]=${DELOREAN_LOCATION:-"${HOME}/.delorean"}
+# build.zsh:
+#   - Build hood/88.zsh -> 88
+#   - DELOREAN[loc]=${DELOREAN_LOCATION:-"${HOME}/.delorean"}
 
-# 88:
-#   COULD link to /usr/local/bin/88
-#   Better to add to ~/.zshenv as DELOREAN_LOCATION/88 (chicken/egg?)
+# Where will record of installed circuits be stored?
+# Can we use flux-capacitor.zsh list to install missing?
 
-# ZDOTDIR/.zshrc
-#   source DELOREAN_LOCATION/88
-
-# Set this in future command
-#   -z  -> Choose a directory...
-#   -zdotdir::zdotdir
-#   --zdotdir '~/ZDOTDIR'
-# elif (( ${+DELOREAN_ZSHENV} ))
-#DELOREAN[zdotdir]="${ZDOTDIR}"
-# else
-#DELOREAN[zdotdir]="${HOME}/.config/ZDOTDIR"
-
-# Move these into import method
-#DELOREAN[dir]="${${funcsourcetrace[1]%:*}:A:h}"
-#DELOREAN[lib]="${DELOREAN[dir]}/lib"
-# Import schematic templates as functions...
-
+# --------------------------------------------------
 
 # 88 is not necessarily in same directory as ZDOTDIR
 #

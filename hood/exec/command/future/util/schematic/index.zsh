@@ -29,6 +29,7 @@
   schema="$("${cmd}")"
   schema="${${schema}//__LOCATION__/${DELOREAN[loc]}}"
   schema="${${schema}//__ZDOTDIR__/${DELOREAN[zdotdir]}}"
+  schema="${${schema}//__CIRCUITS__/${DELOREAN[circuits_loc]}}"
 
   #
   # Write out, ignoring escape conventions of echo.

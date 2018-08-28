@@ -14,7 +14,8 @@
     's=-system' '-system' \
     'c=-chsh' '-chsh' \
     'q=-quiet' '-quiet' \
-    '-zdotdir::'
+    '-zdotdir::' \
+    '-circuits::'
 
   #
   # Set future location of ZDOTDIR.
@@ -32,6 +33,25 @@
 
   if ! [[ -d "${DELOREAN[zdotdir]}" ]]; then
     ${0}.stderr.zdotdir-mkdir
+    builtin return 1
+  fi
+
+  #
+  # Set location of circuits.
+  #
+
+  if (( ${+opts[--circuits]} )); then
+    DELOREAN[circuits_loc]="${opts[--circuits]}"
+  elif (( ${+DELOREAN_ZSHENV} )); then
+    DELOREAN[circuits_loc]="${DELOREAN_CIRCUITS}"
+  else
+    DELOREAN[circuits_loc]="${HOME}/.delorean/circuits"
+  fi
+
+  builtin command mkdir -p "${DELOREAN[circuits_loc]}"
+
+  if ! [[ -d "${DELOREAN[circuits_loc]}" ]]; then
+    ${0}.stderr.circuits-mkdir
     builtin return 1
   fi
 
