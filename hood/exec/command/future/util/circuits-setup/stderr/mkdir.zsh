@@ -1,4 +1,4 @@
-@delorean.exec.command.future.stderr.mkdir-circuits () {
+@delorean.exec.command.future.util.circuits-setup.stderr.mkdir () {
   @delorean.import '~/util/stderr-prefix/'
   @delorean.util.stderr-prefix
 

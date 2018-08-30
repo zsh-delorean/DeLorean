@@ -24,7 +24,7 @@
           case "$?" in
             ('0')
               DELOREAN[login_shell]="${chsh_zsh}"
-              @delorean.log-info "${0} () => DELOREAN[login_shell] = ${DELOREAN[login_shell]}"
+              @delorean.log-var "${0}" 'DELOREAN[login_shell]' "${DELOREAN[login_shell]}"
               ${0}.stderr.end
               return_code='0'
               builtin break

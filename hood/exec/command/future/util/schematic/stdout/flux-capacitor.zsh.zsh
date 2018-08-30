@@ -1,9 +1,9 @@
 @delorean.exec.command.future.util.schematic.stdout--flux-capacitor.zsh () {
 <<'FILE'
 #
-# Tweaking the flux capacitor makes DeLorean travel to an alternate future!
+# Tweaking the flux capacitor lets DeLorean travel to an alternate future!
 #
-# Get DeLorean up to speed by running "88 future" after making any tweaks here.
+# Get DeLorean up to speed by running "88 future" after making any tweaks.
 #
 
 ################################################################################

@@ -1,6 +1,6 @@
 @delorean.exec.command.past() {
   @delorean.import './stderr/*'
-  @delorean.import '../util/zshenv-vars/'
+  @delorean.import '../util/zshenv-setup/'
   @delorean.import './util/zshenv-revert/'
 
   #
@@ -13,7 +13,7 @@
   # Set zshenv variables.
   #
 
-  @delorean.exec.command.util.zshenv-vars "${+opts[--system]}" || builtin return 1
+  @delorean.exec.command.util.zshenv-setup "${opts[--system]+yes}" || builtin return 1
 
   #
   # Revert zshenv.

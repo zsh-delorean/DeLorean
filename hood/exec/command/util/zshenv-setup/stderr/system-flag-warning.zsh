@@ -1,4 +1,4 @@
-@delorean.exec.command.util.zshenv-vars.stderr.system-flag-warning () {
+@delorean.exec.command.util.zshenv-setup.stderr.system-flag-warning () {
   @delorean.import '~/util/stderr-prefix/'
   @delorean.util.stderr-prefix
 

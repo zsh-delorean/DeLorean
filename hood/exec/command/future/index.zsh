@@ -1,5 +1,7 @@
 @delorean.exec.command.future () {
-  @delorean.import '../util/zshenv-vars/'
+  @delorean.import './util/zdotdir-setup/'
+  @delorean.import './util/circuits-setup/'
+  @delorean.import '../util/zshenv-setup/'
   @delorean.import './util/zshenv-displace/'
   @delorean.import './util/schematic/'
   @delorean.import './util/login-shell-identify/'
@@ -17,53 +19,25 @@
     '-zdotdir::' \
     '-circuits::'
 
+  @delorean.log-opts "${0}" 'opts' "${(kv)opts[@]}"
+
   #
   # Set future location of ZDOTDIR.
   #
 
-  if (( ${+opts[--zdotdir]} )); then
-    DELOREAN[zdotdir]="${opts[--zdotdir]}"
-  elif (( ${+DELOREAN_ZSHENV} )) && (( ${+ZDOTDIR} )); then
-    DELOREAN[zdotdir]="${ZDOTDIR}"
-  else
-    DELOREAN[zdotdir]="${HOME}/.config/ZDOTDIR"
-  fi
-
-  @delorean.log-info "${0} () => DELOREAN[zdotdir] = ${DELOREAN[zdotdir]}"
-
-  builtin command mkdir -p "${DELOREAN[zdotdir]}"
-
-  if ! [[ -d "${DELOREAN[zdotdir]}" ]]; then
-    ${0}.stderr.mkdir-zdotdir
-    builtin return 1
-  fi
+  ${0}.util.zdotdir-setup "${opts[--zdotdir]}" || builtin return 1
 
   #
   # Set location of circuits.
   #
 
-  if (( ${+opts[--circuits]} )); then
-    DELOREAN[circuits_loc]="${opts[--circuits]}"
-  elif (( ${+DELOREAN_ZSHENV} )) && (( ${+DELOREAN_CIRCUITS} )); then
-    DELOREAN[circuits_loc]="${DELOREAN_CIRCUITS}"
-  else
-    DELOREAN[circuits_loc]="${HOME}/.delorean/circuits"
-  fi
-
-  @delorean.log-info "${0} () => DELOREAN[circuits_loc] = ${DELOREAN[circuits_loc]}"
-
-  builtin command mkdir -p "${DELOREAN[circuits_loc]}"
-
-  if ! [[ -d "${DELOREAN[circuits_loc]}" ]]; then
-    ${0}.stderr.mkdir-circuits
-    builtin return 1
-  fi
+  ${0}.util.circuits-setup "${opts[--circuits]}" || builtin return 1
 
   #
   # Set zshenv variables.
   #
 
-  @delorean.exec.command.util.zshenv-vars "${+opts[--system]}" || builtin return 1
+  @delorean.exec.command.util.zshenv-setup "${opts[--system]+yes}" || builtin return 1
 
   #
   # Temporally displace zshenv (backs up to f.ex: ~/zshenv.past).
@@ -82,7 +56,7 @@
   for file in "${user_files[@]}"; do
     {
       ${0}.util.schematic "${file}" "${DELOREAN[zdotdir]}/${file}"
-    } 2>/dev/${${${DELOREAN[debug]/0}:+stderr}:-null}
+    } 2>/dev/${${${DELOREAN[debug]}:+stderr}:-null}
   done
 
   #
@@ -102,7 +76,7 @@
   #
 
   DELOREAN[login_shell]="${SHELL}"
-  @delorean.log-info "${0} () => DELOREAN[login_shell] = ${DELOREAN[login_shell]}"
+  @delorean.log-var "${0}" 'DELOREAN[login_shell]' "${DELOREAN[login_shell]}"
 
   if (( ${+opts[--chsh]} )); then
     ${0}.util.login-shell-identify
@@ -124,13 +98,13 @@
 
   if ! (( ${+opts[--quiet]} )); then
     if [[ "$(<"${DELOREAN[loc]}/README.md")" =~ '```DeLorean(.*)```' ]]; then
-      builtin print -f "%s\n" "${match[1]}"
-    fi
+      builtin print -f "%s\n" "${match[1]}" >&2
 
-    if (( ${+commands[afplay]} )); then
-      builtin command afplay "${DELOREAN[loc]}/.github/bttf.wav" &>/dev/null &!
-    elif (( ${+commands[aplay]} )); then
-      builtin command aplay -t 'wav' "${DELOREAN[loc]}/.github/bttf.wav" &>/dev/null &!
+      if (( ${+commands[afplay]} )); then
+        builtin command afplay "${DELOREAN[loc]}/.github/bttf.wav" &>/dev/null &!
+      elif (( ${+commands[aplay]} )); then
+        builtin command aplay -t 'wav' "${DELOREAN[loc]}/.github/bttf.wav" &>/dev/null &!
+      fi
     fi
   fi
 

@@ -27,7 +27,7 @@
         if (( ${#ssh_stdout} > 2 )); then
           return_code='0'
           DELOREAN[login_shell]="${ssh_stdout}"
-          @delorean.log-info "${0} () => DELOREAN[login_shell] = ${DELOREAN[login_shell]}"
+          @delorean.log-var "${0}" 'DELOREAN[login_shell]' "${DELOREAN[login_shell]}"
           ${0}.stderr.end
         else
           ${0}.stderr.skip 'FAILED'

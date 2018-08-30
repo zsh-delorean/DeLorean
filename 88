@@ -18,16 +18,31 @@ fi
 #
 
 @delorean.log () {
-  (( ${DELOREAN[debug]} )) && builtin print "${DELOREAN[prog]}[${1}]: ${2}"
+  (( ${#DELOREAN[debug]} )) && builtin print "${DELOREAN[prog]}[${1}]: ${2}"
 }
 
 @delorean.log-info () {
   @delorean.log 'info' "${1}"
 }
 
-@delorean.log-DELOREAN () {
-  for key value in "${(kv)DELOREAN[@]}"; do
-    @delorean.log-info "DELOREAN[${key}] => ${value}"
+@delorean.log-cmd () {
+  @delorean.log-info "${1} () => ${2} ${*[3,-1]}"
+}
+
+@delorean.log-var () {
+  @delorean.log-info "${1} () => ${2}='${3}'"
+}
+
+@delorean.log-opts () {
+  builtin local 'func' 'name'
+  builtin local -A 'opts'
+
+  func="${1}"
+  name="${2}"
+  opts=("${@[3,-1]}")
+
+  for key value in "${(kv)opts[@]}"; do
+    @delorean.log-var "${func}" "${name}[${key}]" "${value}"
   done
 }
 
@@ -36,7 +51,7 @@ fi
 #
 
 @delorean.import () {
-  (( ${DELOREAN[dev]} )) || builtin return 0
+  (( ${#DELOREAN[dev]} )) || builtin return 0
 
   builtin local -a 'parts' 'middle'
   builtin local 'front' 'back' 'trace' 'search' 'file'
@@ -88,8 +103,8 @@ fi
 
   builtin zparseopts -A opts -D -E -M -- '-dev' '-debug'
 
-  DELOREAN[dev]="${+opts[--dev]}"
-  DELOREAN[debug]="${+opts[--debug]}"
+  DELOREAN[dev]="${opts[--dev]+yes}"
+  DELOREAN[debug]="${opts[--debug]+yes}"
 
   #
   # Entry point depends on invokation method.
@@ -104,7 +119,7 @@ fi
     #
 
     DELOREAN[prog]='DeLorean'
-    @delorean.log-DELOREAN
+    @delorean.log-opts "${0}" 'DELOREAN' "${(kv)DELOREAN[@]}"
 
     @delorean.import '~/source/'
     @delorean.source
@@ -116,10 +131,10 @@ fi
     #
 
     DELOREAN[prog]='88'
-    @delorean.log-DELOREAN
+    @delorean.log-opts "${0}" 'DELOREAN' "${(kv)DELOREAN[@]}"
 
     @delorean.import '~/exec/'
-    if @delorean.exec "${@[@]}"; then
+    if @delorean.exec "${@}"; then
       #
       # Don't start any subprocess if STDIN is not a TTY.
       #
@@ -159,7 +174,7 @@ fi
 # Get DeLorean up to speed!
 #
 
-88 "${@[@]}"
+88 "${@}"
 builtin return "${?}"
 
 
@@ -170,15 +185,18 @@ builtin return "${?}"
 
 
 
+# Try:
+#  - zplugin zsh-delorean/circuit-blah atload'circuit-blah; circuit-blah'
+#    - after source 88 / before source 88
+
+# build.zsh:
+#   - Build hood/88.zsh -> 88
+#   - ??? DELOREAN[loc]=${DELOREAN_LOCATION:-"${HOME}/.delorean"}
 
 # Installer will clone zsh-delorean/DeLorean to:
 #   ~/.delorean/DeLorean/{build.zsh,hood,.github,.git,.gitignore}
 #   ~/.delorean/circuits/{.git,.gitmodules,circuit-git,circuit-editor}
 #   ~/.zplugin/
-
-# build.zsh:
-#   - Build hood/88.zsh -> 88
-#   - DELOREAN[loc]=${DELOREAN_LOCATION:-"${HOME}/.delorean"}
 
 # Where will record of installed circuits be stored?
 # Can we use flux-capacitor.zsh list to install missing?

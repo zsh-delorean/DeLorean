@@ -1,4 +1,4 @@
-@delorean.exec.command.future.stderr.mkdir-zdotdir () {
+@delorean.exec.command.future.util.zdotdir-setup.stderr.mkdir () {
   @delorean.import '~/util/stderr-prefix/'
   @delorean.util.stderr-prefix
 

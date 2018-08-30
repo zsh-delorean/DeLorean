@@ -7,7 +7,7 @@
   out="${2}"
   su="${3}"
 
-  @delorean.log-info "${0} () => Materialize ${out} from ${in} ${su:+'with sudo.'}"
+  @delorean.log-info "${0} () => ${out} from ${in} ${su:+'with sudo.'}"
 
   cmd="${0}.stdout--${in}"
   @delorean.import "./stdout/${in}"

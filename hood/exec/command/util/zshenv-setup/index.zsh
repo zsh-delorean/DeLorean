@@ -1,4 +1,4 @@
-@delorean.exec.command.util.zshenv-vars () {
+@delorean.exec.command.util.zshenv-setup () {
   builtin local 'system' 'zshenv_epoch'
 
   system="${1}"
@@ -7,7 +7,7 @@
   # Zshenv variables.
   #
 
-  if (( ${system} )); then
+  if (( ${#system} )); then
     DELOREAN[zshenv_su]='yes'
     DELOREAN[zshenv_ext]='system'
     DELOREAN[zshenv_loc]="/etc/zshenv"
@@ -18,7 +18,7 @@
         builtin return 1
       fi
     fi
-    (( ${+DELOREAN[zshenv_su]} )) && builtin unset 'DELOREAN[zshenv_su]'
+    (( ${#DELOREAN[zshenv_su]} )) && builtin unset 'DELOREAN[zshenv_su]'
     DELOREAN[zshenv_ext]='user'
     DELOREAN[zshenv_loc]="${HOME}/.zshenv"
   fi
