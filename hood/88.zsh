@@ -94,9 +94,6 @@ fi
 
   builtin typeset -gAH 'DELOREAN' 'DELOREAN_TRUNK'
 
-  DELOREAN[min_zsh_version]='5.0'
-  DELOREAN[loc]="${${funcsourcetrace[1]%:*}:A:h}"
-
   #
   # Parse flags and set universal options.
   #
@@ -106,8 +103,11 @@ fi
   DELOREAN[dev]="${opts[--dev]+yes}"
   DELOREAN[debug]="${opts[--debug]+yes}"
 
+  DELOREAN[min_zsh_version]='5.0'
+  DELOREAN[loc]="${${funcsourcetrace[1]%:*}:A:h}"
+
   #
-  # Entry point depends on invokation method.
+  # Invokation method determines entry point.
   #
 
   if [[ "${ZSH_EVAL_CONTEXT[1,4]}" == 'file' ]]; then
