@@ -1,14 +1,14 @@
 #!/usr/bin/env zsh
 
-builtin :>! 88
-
-<<EOF >> '88'
+<<EOF >! '88'
 #!/usr/bin/env zsh
 
 EOF
 
-setopt EXTENDED_GLOB
-< hood/**/(^88).zsh >> '88'
+() {
+  builtin setopt 'local_options' 'extended_glob'
+  < hood/**/(^88).zsh >> '88'
+}
 
 < 'hood/88.zsh' >> '88'
 
