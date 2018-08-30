@@ -21,4 +21,6 @@
     ${0}.stderr.mkdir
     builtin return 1
   fi
+  
+  builtin return 0
 }

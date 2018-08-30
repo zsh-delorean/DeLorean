@@ -8,4 +8,6 @@
     ${0}.stderr.is-sudo
     builtin return 1
   fi
+
+  builtin return 0
 }
