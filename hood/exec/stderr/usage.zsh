@@ -4,7 +4,7 @@
 
 <<EOF >&2
 
-${DELOREAN_TRUNK[T]}usage: ${DELOREAN[prog]} [-option ...] [--] command [-option ...]
+${DELOREAN_TRUNK[T]}usage: ${DELOREAN[prog]} [-option ...] command [-option ...]
 ${DELOREAN_TRUNK[I]}
 ${DELOREAN_TRUNK[I]}options:
 ${DELOREAN_TRUNK[I]}  --dev         Import source files.

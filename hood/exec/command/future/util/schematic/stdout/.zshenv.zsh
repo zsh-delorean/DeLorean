@@ -56,9 +56,9 @@
 # be set to the proper location even for one-off command argument calls to Zsh.
 #
 
-if [[ ! -d "$TMPDIR" ]]; then
-  export TMPDIR="/tmp/$LOGNAME"
-  mkdir -p -m 700 "$TMPDIR"
+if ! [[ -d "${TMPDIR}" ]]; then
+  export TMPDIR="/tmp/${LOGNAME}"
+  mkdir -p -m 700 "${TMPDIR}"
 fi
 
 #
@@ -95,7 +95,7 @@ export TMPPREFIX="${TMPDIR%/}/zsh"
 
 if [[ -o LOGIN ]]; then
   export DELOREAN_ENV_EXISTS='yes'
-elif [[ -o INTERACTIVE && -z "${DELOREAN_ENV_EXISTS}" ]]; then
+elif [[ -o INTERACTIVE ]] && [[ -z "${DELOREAN_ENV_EXISTS}" ]]; then
   export DELOREAN_ENV_EXISTS='yes'
   [[ -s "${ZDOTDIR}/.zprofile" ]] && source "${ZDOTDIR}/.zprofile"
 fi

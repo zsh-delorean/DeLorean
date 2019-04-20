@@ -1,5 +1,5 @@
 #
-# Only allow sourcing from Zsh.
+# Only allow sourcing from Zsh (POSIX compatible).
 #
 
 if [ -z $ZSH_VERSION ]; then
@@ -105,7 +105,7 @@ fi
   DELOREAN[loc]="${${funcsourcetrace[1]%:*}:A:h}"
 
   #
-  # Invokation method determines entry point.
+  # Invocation method determines entry point.
   #
 
   if [[ "${ZSH_EVAL_CONTEXT[1,4]}" == 'file' ]]; then
@@ -134,10 +134,10 @@ fi
     @delorean.import '~/exec/'
     if @delorean.exec "${@}"; then
       #
-      # Don't start any subprocess if STDIN is not a TTY.
+      # Don't start any subprocess if STDIN is not a TTY or STDIN is a pipe.
       #
 
-      if ! [[ -t 0 || -p /dev/stdin ]]; then
+      if ! [[ -t 0 ]] || [[ -p /dev/stdin ]]; then
         builtin return 0
       fi
 

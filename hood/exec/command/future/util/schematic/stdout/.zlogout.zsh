@@ -23,7 +23,7 @@
 #
 
 # If STDERR is bound to a TTY.
-[[ -o INTERACTIVE && -t 2 ]] && {
+[[ -o INTERACTIVE ]] && [[ -t 2 ]] && {
 
   # Print the farewell.
   print
