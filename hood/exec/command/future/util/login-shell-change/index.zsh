@@ -16,7 +16,7 @@
 
       chsh_zsh="$(grep '/zsh$' '/etc/shells' | tail '-1')"
 
-      if [[ -n "$("${chsh_zsh}" -c 'print "${ZSH_VERSION}"')" ]]; then
+      if [[ -n "$("${chsh_zsh}" -c 'builtin print "${ZSH_VERSION}"')" ]]; then
         builtin trap 'true' 'INT'
         while true; do
           chsh_zsh_stderr="$(chsh -s "${chsh_zsh}" 2>&1)"
